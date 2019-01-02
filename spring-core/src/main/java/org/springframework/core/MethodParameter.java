@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import kotlin.reflect.KFunction;
@@ -69,7 +70,7 @@ public class MethodParameter {
 
 	private int nestingLevel = 1;
 
-	/** Map from Integer level to Integer type index */
+	/** Map from Integer level to Integer type index. */
 	@Nullable
 	Map<Integer, Integer> typeIndexesPerLevel;
 
@@ -227,6 +228,9 @@ public class MethodParameter {
 	 * @since 5.0
 	 */
 	public Parameter getParameter() {
+		if (this.parameterIndex < 0) {
+			throw new IllegalStateException("Cannot retrieve Parameter descriptor for method return type");
+		}
 		Parameter parameter = this.parameter;
 		if (parameter == null) {
 			parameter = getExecutable().getParameters()[this.parameterIndex];
@@ -339,7 +343,9 @@ public class MethodParameter {
 	 */
 	public boolean isOptional() {
 		return (getParameterType() == Optional.class || hasNullableAnnotation() ||
-				(KotlinDetector.isKotlinType(getContainingClass()) && KotlinDelegate.isOptional(this)));
+				(KotlinDetector.isKotlinReflectPresent() &&
+						KotlinDetector.isKotlinType(getContainingClass()) &&
+						KotlinDelegate.isOptional(this)));
 	}
 
 	/**
@@ -419,7 +425,18 @@ public class MethodParameter {
 				paramType = (method != null ? method.getGenericReturnType() : void.class);
 			}
 			else {
-				paramType = this.executable.getGenericParameterTypes()[this.parameterIndex];
+				Type[] genericParameterTypes = this.executable.getGenericParameterTypes();
+				int index = this.parameterIndex;
+				if (this.executable instanceof Constructor &&
+						ClassUtils.isInnerClass(this.executable.getDeclaringClass()) &&
+						genericParameterTypes.length == this.executable.getParameterCount() - 1) {
+					// Bug in javac: type array excludes enclosing instance parameter
+					// for inner classes with at least one generic constructor parameter,
+					// so access it with the actual parameter index lowered by 1
+					index = this.parameterIndex - 1;
+				}
+				paramType = (index >= 0 && index < genericParameterTypes.length ?
+						genericParameterTypes[index] : getParameterType());
 			}
 			this.genericParameterType = paramType;
 		}
@@ -525,12 +542,8 @@ public class MethodParameter {
 				// for inner classes, so access it with the actual parameter index lowered by 1
 				index = this.parameterIndex - 1;
 			}
-			if (index >= 0 && index < annotationArray.length) {
-				paramAnns = adaptAnnotationArray(annotationArray[index]);
-			}
-			else {
-				paramAnns = EMPTY_ANNOTATION_ARRAY;
-			}
+			paramAnns = (index >= 0 && index < annotationArray.length ?
+					adaptAnnotationArray(annotationArray[index]) : EMPTY_ANNOTATION_ARRAY);
 			this.parameterAnnotations = paramAnns;
 		}
 		return paramAnns;
@@ -590,6 +603,9 @@ public class MethodParameter {
 	 */
 	@Nullable
 	public String getParameterName() {
+		if (this.parameterIndex < 0) {
+			return null;
+		}
 		ParameterNameDiscoverer discoverer = this.parameterNameDiscoverer;
 		if (discoverer != null) {
 			String[] parameterNames = null;
@@ -717,8 +733,16 @@ public class MethodParameter {
 	protected static int findParameterIndex(Parameter parameter) {
 		Executable executable = parameter.getDeclaringExecutable();
 		Parameter[] allParams = executable.getParameters();
+		// Try first with identity checks for greater performance.
 		for (int i = 0; i < allParams.length; i++) {
 			if (parameter == allParams[i]) {
+				return i;
+			}
+		}
+		// Potentially try again with object equality checks in order to avoid race
+		// conditions while invoking java.lang.reflect.Executable.getParameters().
+		for (int i = 0; i < allParams.length; i++) {
+			if (parameter.equals(allParams[i])) {
 				return i;
 			}
 		}
@@ -728,7 +752,8 @@ public class MethodParameter {
 
 	private static int validateIndex(Executable executable, int parameterIndex) {
 		int count = executable.getParameterCount();
-		Assert.isTrue(parameterIndex < count, () -> "Parameter index needs to be between -1 and " + (count - 1));
+		Assert.isTrue(parameterIndex >= -1 && parameterIndex < count,
+				() -> "Parameter index needs to be between -1 and " + (count - 1));
 		return parameterIndex;
 	}
 
@@ -752,17 +777,21 @@ public class MethodParameter {
 			}
 			else {
 				KFunction<?> function = null;
+				Predicate<KParameter> predicate = null;
 				if (method != null) {
 					function = ReflectJvmMapping.getKotlinFunction(method);
+					predicate = p -> KParameter.Kind.VALUE.equals(p.getKind());
 				}
 				else if (ctor != null) {
 					function = ReflectJvmMapping.getKotlinFunction(ctor);
+					predicate = p -> KParameter.Kind.VALUE.equals(p.getKind()) ||
+							KParameter.Kind.INSTANCE.equals(p.getKind());
 				}
 				if (function != null) {
 					List<KParameter> parameters = function.getParameters();
 					KParameter parameter = parameters
 							.stream()
-							.filter(p -> KParameter.Kind.VALUE.equals(p.getKind()))
+							.filter(predicate)
 							.collect(Collectors.toList())
 							.get(index);
 					return (parameter.getType().isMarkedNullable() || parameter.isOptional());
@@ -770,7 +799,6 @@ public class MethodParameter {
 			}
 			return false;
 		}
-		
 	}
 
 }

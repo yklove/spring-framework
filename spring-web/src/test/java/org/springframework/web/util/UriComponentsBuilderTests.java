@@ -36,13 +36,15 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 /**
- * Unit tests for {@link org.springframework.web.util.UriComponentsBuilder}.
+ * Unit tests for {@link UriComponentsBuilder}.
  *
  * @author Arjen Poutsma
+ * @author Rossen Stoyanchev
  * @author Phillip Webb
  * @author Oliver Gierke
- * @author David Eckel
+ * @author Juergen Hoeller
  * @author Sam Brannen
+ * @author David Eckel
  */
 public class UriComponentsBuilderTests {
 
@@ -426,6 +428,21 @@ public class UriComponentsBuilderTests {
 		assertEquals(-1, result.getPort());
 	}
 
+	@Test  // SPR-16863
+	public void fromHttpRequestWithForwardedSsl() {
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		request.setScheme("http");
+		request.setServerName("example.org");
+		request.setServerPort(10080);
+		request.addHeader("X-Forwarded-Ssl", "on");
+
+		HttpRequest httpRequest = new ServletServerHttpRequest(request);
+		UriComponents result = UriComponentsBuilder.fromHttpRequest(httpRequest).build();
+
+		assertEquals("https", result.getScheme());
+		assertEquals("example.org", result.getHost());
+		assertEquals(-1, result.getPort());
+	}
 
 	@Test
 	public void fromHttpRequestWithForwardedHostWithForwardedScheme() {
@@ -738,10 +755,10 @@ public class UriComponentsBuilderTests {
 	@Test
 	public void testClone() {
 		UriComponentsBuilder builder1 = UriComponentsBuilder.newInstance();
-		builder1.scheme("http").host("e1.com").path("/p1").pathSegment("ps1").queryParam("q1").fragment("f1");
+		builder1.scheme("http").host("e1.com").path("/p1").pathSegment("ps1").queryParam("q1").fragment("f1").encode();
 
 		UriComponentsBuilder builder2 = (UriComponentsBuilder) builder1.clone();
-		builder2.scheme("https").host("e2.com").path("p2").pathSegment("ps2").queryParam("q2").fragment("f2");
+		builder2.scheme("https").host("e2.com").path("p2").pathSegment("{ps2}").queryParam("q2").fragment("f2");
 
 		UriComponents result1 = builder1.build();
 		assertEquals("http", result1.getScheme());
@@ -750,10 +767,10 @@ public class UriComponentsBuilderTests {
 		assertEquals("q1", result1.getQuery());
 		assertEquals("f1", result1.getFragment());
 
-		UriComponents result2 = builder2.build();
+		UriComponents result2 = builder2.buildAndExpand("ps2;a");
 		assertEquals("https", result2.getScheme());
 		assertEquals("e2.com", result2.getHost());
-		assertEquals("/p1/ps1/p2/ps2", result2.getPath());
+		assertEquals("/p1/ps1/p2/ps2%3Ba", result2.getPath());
 		assertEquals("q1&q2", result2.getQuery());
 		assertEquals("f2", result2.getFragment());
 	}
@@ -902,9 +919,19 @@ public class UriComponentsBuilderTests {
 	public void uriComponentsNotEqualAfterNormalization() {
 		UriComponents uri1 = UriComponentsBuilder.fromUriString("http://test.com").build().normalize();
 		UriComponents uri2 = UriComponentsBuilder.fromUriString("http://test.com/").build();
+
 		assertTrue(uri1.getPathSegments().isEmpty());
 		assertTrue(uri2.getPathSegments().isEmpty());
 		assertNotEquals(uri1, uri2);
+	}
+
+	@Test  // SPR-17256
+	public void uriComponentsWithMergedQueryParams() {
+		String uri = UriComponentsBuilder.fromUriString("http://localhost:8081")
+				.uriComponents(UriComponentsBuilder.fromUriString("/{path}?sort={sort}").build())
+				.queryParam("sort", "another_value").build().toString();
+
+		assertEquals("http://localhost:8081/{path}?sort={sort}&sort=another_value", uri);
 	}
 
 }
