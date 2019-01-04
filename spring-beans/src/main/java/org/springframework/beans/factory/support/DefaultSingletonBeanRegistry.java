@@ -163,19 +163,6 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	private final Map<String, Set<String>> dependenciesForBeanMap = new ConcurrentHashMap<>(64);
 
 
-	/**
-	 * 在给定的bean名称下，将给定的现有对象注册为bean注册表中的单例。
-	 * 给定的实例应该被完全初始化; 注册表不会执行任何初始化回调（特别是，它不会调用InitializingBean的afterPropertiesSet方法）。
-	 * 给定的实例也不会收到任何销毁回调（如DisposableBean的销毁方法）。
-	 * 在完整BeanFactory中运行时：如果您的bean应该接收初始化或销毁回调，则注册一个bean定义而不是现有的实例。
-	 * 通常在注册表配置期间调用，但也可以用于单例的运行时注册。
-	 * 因此，注册管理机构实施应该同步单例的访问;
-	 * 如果它支持BeanFactory对单例的懒惰初始化，它将不得不这样做。
-	 *
-	 * @param beanName the name of the bean 给定bean的名字
-	 * @param singletonObject the existing singleton object 给出的单例对象
-	 * @throws IllegalStateException
-	 */
 	@Override
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
 		//判断beanName不为空
