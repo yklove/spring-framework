@@ -64,11 +64,11 @@ public class SimpleAliasRegistry implements AliasRegistry {
 		Assert.hasText(name, "'name' must not be empty");
 		//断言 如果alias为空,抛出AssertionError
 		Assert.hasText(alias, "'alias' must not be empty");
-		//加锁，原因是ConcurrentHashMap的迭代器并不是线程安全的。
+		//加锁，原因是ConcurrentHashMap的迭代器并不是线程安全的.
         //在checkForAliasCircle时用到了ConcurrentHashMap的迭代器
 		synchronized (this.aliasMap) {
-		    //如果别名和名称相同,则从aliasMap删除该别名。
-            //原因：别名等于原名,认为别名没有意义。
+		    //如果别名和名称相同,则从aliasMap删除该别名.
+            //原因：别名等于原名,认为别名没有意义.
 			if (alias.equals(name)) {
 				this.aliasMap.remove(alias);
 				if (logger.isDebugEnabled()) {
@@ -79,9 +79,9 @@ public class SimpleAliasRegistry implements AliasRegistry {
 			else {
 			    //根据别名取名称(registeredName)
 				String registeredName = this.aliasMap.get(alias);
-				//如果名称(registeredName)不为空,说明该别名已被占用。
+				//如果名称(registeredName)不为空,说明该别名已被占用.
 				if (registeredName != null) {
-				    //判断该别名对应的名称是否等于传入的名称。
+				    //判断该别名对应的名称是否等于传入的名称.
 					if (registeredName.equals(name)) {
 						// An existing alias - no need to re-register
                         // 得出别名已存在的结论,无需操作,直接return
@@ -98,7 +98,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 								registeredName + "' with new target name '" + name + "'");
 					}
 				}
-				//检查别名与名称的关系,防止出现名称与别名的关系循环(循环引用)。
+				//检查别名与名称的关系,防止出现名称与别名的关系循环(循环引用).
 				checkForAliasCircle(name, alias);
 				//增加别名与名称的关系,存储到aliasMap中
 				this.aliasMap.put(alias, name);
@@ -121,13 +121,13 @@ public class SimpleAliasRegistry implements AliasRegistry {
 
 	/**
 	 * Determine whether the given name has the given alias registered.
-     * 确定给定名称是否已注册给定的别名。
+     * 确定给定名称是否已注册给定的别名.
 	 * @param name the name to check 需要检查的名称
 	 * @param alias the alias to look for 要查找的别名
 	 * @since 4.2.1
 	 */
 	public boolean hasAlias(String name, String alias) {
-	    //遍历aliasMap,根据名称查找对应的别名。
+	    //遍历aliasMap,根据名称查找对应的别名.
 		for (Map.Entry<String, String> entry : this.aliasMap.entrySet()) {
 		    //取出名称
 			String registeredName = entry.getValue();
@@ -136,7 +136,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 			    //取出别名
 				String registeredAlias = entry.getKey();
 				//如果别名与传入的别名相同 则返回true
-				//或者 别名与传入的别名不相同 但是别名的别名与传入的别名相同 返回true 注意这里是递归进行判断,会遍历所有的别名。
+				//或者 别名与传入的别名不相同 但是别名的别名与传入的别名相同 返回true 注意这里是递归进行判断,会遍历所有的别名.
 				if (registeredAlias.equals(alias) || hasAlias(registeredAlias, alias)) {
 					return true;
 				}
@@ -164,7 +164,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	}
 
     /**
-     * 确定给定的名称是否为别名。
+     * 确定给定的名称是否为别名.
      * @param name the name to check 要检查的名称
      * @return
      */
@@ -216,8 +216,8 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	 * <p>The value resolver may for example resolve placeholders
 	 * in target bean names and even in alias names.
 	 * 解析在该工厂中注册的所有别名目标名称和别名，
-	 * 并将给定的用于解析字符串的接口(StringValueResolver)应用于它们。
-	 * 值解析器可以例如解析目标bean名称中的占位符，甚至可以解析别名。
+	 * 并将给定的用于解析字符串的接口(StringValueResolver)应用于它们.
+	 * 值解析器可以例如解析目标bean名称中的占位符，甚至可以解析别名.
 	 * @param valueResolver the StringValueResolver to apply
 	 */
 	public void resolveAliases(StringValueResolver valueResolver) {
@@ -268,7 +268,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 				}
 				//如果解析前后别名相同 但是解析前后名称不同
 				else if (!registeredName.equals(resolvedName)) {
-					//修改原有别名映射,指向解析后的名称。
+					//修改原有别名映射,指向解析后的名称.
 					this.aliasMap.put(alias, resolvedName);
 				}
 			});
@@ -279,15 +279,15 @@ public class SimpleAliasRegistry implements AliasRegistry {
 	 * Check whether the given name points back to the given alias as an alias
 	 * in the other direction already, catching a circular reference upfront
 	 * and throwing a corresponding IllegalStateException.
-     * 检查名称是否以及指向了别名,或者别名的别名。
-     * 防止出现循环引用，如果会出现,抛出IllegalStateException。
+     * 检查名称是否以及指向了别名,或者别名的别名.
+     * 防止出现循环引用，如果会出现,抛出IllegalStateException.
 	 * @param name the candidate name 待判断的名称
 	 * @param alias the candidate alias 待判断的别名
 	 * @see #registerAlias
 	 * @see #hasAlias
 	 */
 	protected void checkForAliasCircle(String name, String alias) {
-	    //如果名称已经执行了别名，或者别名的别名，抛出IllegalStateException异常。
+	    //如果名称已经执行了别名，或者别名的别名，抛出IllegalStateException异常.
 		if (hasAlias(alias, name)) {
 			throw new IllegalStateException("Cannot register alias '" + alias +
 					"' for name '" + name + "': Circular reference - '" +
@@ -297,7 +297,7 @@ public class SimpleAliasRegistry implements AliasRegistry {
 
 	/**
 	 * Determine the raw name, resolving aliases to canonical names.
-	 * 确定原始名称，将别名解析为真实名称。
+	 * 确定原始名称，将别名解析为真实名称.
 	 * @param name the user-specified name 用户指定的名称
 	 * @return the transformed name 转换后的名字
 	 */

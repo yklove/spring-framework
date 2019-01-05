@@ -1092,15 +1092,26 @@ public abstract class StringUtils {
 	/**
 	 * Tokenize the given {@code String} into a {@code String} array via a
 	 * {@link StringTokenizer}.
+	 *
+	 * 通过一个将给定的数据标记String为一个String数组 StringTokenizer.
+	 * 修剪标记并省略空标记.
+	 *
 	 * <p>Trims tokens and omits empty tokens.
+	 *
+	 * 给定的分隔符字符串可以包含任意数量的分隔符.
+	 *
 	 * <p>The given {@code delimiters} string can consist of any number of
 	 * delimiter characters. Each of those characters can be used to separate
 	 * tokens. A delimiter is always a single character; for multi-character
 	 * delimiters, consider using {@link #delimitedListToStringArray}.
-	 * @param str the {@code String} to tokenize (potentially {@code null} or empty)
-	 * @param delimiters the delimiter characters, assembled as a {@code String}
-	 * (each of the characters is individually considered as a delimiter)
-	 * @return an array of the tokens
+	 *
+	 * 这些字符中的每一个都可用于分隔令牌.分隔符始终是单个字符;
+	 * 对于多字符分隔符，请考虑使用delimitedListToStringArray(java.lang.String, java.lang.String).
+	 *
+	 * @param str the {@code String} to tokenize (potentially {@code null} or empty). String标记化（可能null或空）
+	 * @param delimiters the delimiter characters, assembled as a {@code String}. 分隔符字符，汇编为String
+	 * (each of the characters is individually considered as a delimiter). （每个字符分别被视为分隔符）
+	 * @return an array of the tokens. 一系列令牌
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
 	 * @see #delimitedListToStringArray
@@ -1112,18 +1123,28 @@ public abstract class StringUtils {
 	/**
 	 * Tokenize the given {@code String} into a {@code String} array via a
 	 * {@link StringTokenizer}.
+	 *
+	 *
+	 * 通过一个将给定的数据标记String为一个String数组 StringTokenizer.
+	 * 修剪标记并省略空标记.
+	 *
 	 * <p>The given {@code delimiters} string can consist of any number of
 	 * delimiter characters. Each of those characters can be used to separate
 	 * tokens. A delimiter is always a single character; for multi-character
 	 * delimiters, consider using {@link #delimitedListToStringArray}.
-	 * @param str the {@code String} to tokenize (potentially {@code null} or empty)
-	 * @param delimiters the delimiter characters, assembled as a {@code String}
-	 * (each of the characters is individually considered as a delimiter)
-	 * @param trimTokens trim the tokens via {@link String#trim()}
-	 * @param ignoreEmptyTokens omit empty tokens from the result array
+	 *
+	 * 这些字符中的每一个都可用于分隔令牌.分隔符始终是单个字符;
+	 * 对于多字符分隔符，请考虑使用delimitedListToStringArray(java.lang.String, java.lang.String).
+	 *
+	 * @param str the {@code String} to tokenize (potentially {@code null} or empty). String标记化（可能null或空）
+	 * @param delimiters the delimiter characters, assembled as a {@code String}. 分隔符字符，汇编为String
+	 * (each of the characters is individually considered as a delimiter).（每个字符分别被视为分隔符）
+	 * @param trimTokens trim the tokens via {@link String#trim()}.通过修剪标记 String.trim()
+	 * @param ignoreEmptyTokens omit empty tokens from the result array.省略结果数组中的空标记.
 	 * (only applies to tokens that are empty after trimming; StringTokenizer
 	 * will not consider subsequent delimiters as token in the first place).
-	 * @return an array of the tokens
+	 * (仅适用于修剪后为空的标记; StringTokenizer首先不会将后续分隔符视为标记).
+	 * @return an array of the tokens.一系列令牌
 	 * @see java.util.StringTokenizer
 	 * @see String#trim()
 	 * @see #delimitedListToStringArray

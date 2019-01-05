@@ -43,8 +43,8 @@ import org.springframework.util.StringUtils;
  * Allows for registering singleton instances that should be shared
  * for all callers of the registry, to be obtained via bean name.
  *
- * 共享bean实例的通用注册表，实现SingletonBeanRegistry。
- * 允许注册应该为注册表的所有调用者共享的单例实例，通过bean名称获取。
+ * 共享bean实例的通用注册表，实现SingletonBeanRegistry.
+ * 允许注册应该为注册表的所有调用者共享的单例实例，通过bean名称获取.
  *
  * <p>Also supports registration of
  * {@link org.springframework.beans.factory.DisposableBean} instances,
@@ -52,8 +52,8 @@ import org.springframework.util.StringUtils;
  * to be destroyed on shutdown of the registry. Dependencies between
  * beans can be registered to enforce an appropriate shutdown order.
  *
- * 还支持在注册表关闭时销毁DisposableBean实例的注册（可能与注册的单例对应，也可能不对应）。
- * 可以注册Bean之间的依赖关系以强制执行适当的关闭命令。
+ * 还支持在注册表关闭时销毁DisposableBean实例的注册（可能与注册的单例对应，也可能不对应）.
+ * 可以注册Bean之间的依赖关系以强制执行适当的关闭命令.
  *
  * <p>This class mainly serves as base class for
  * {@link org.springframework.beans.factory.BeanFactory} implementations,
@@ -61,8 +61,8 @@ import org.springframework.util.StringUtils;
  * the {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}
  * interface extends the {@link SingletonBeanRegistry} interface.
  *
- * 这个类主要作为BeanFactory实现的基类，分解了单例bean实例的通用管理。
- * 请注意，ConfigurableBeanFactory接口扩展了SingletonBeanRegistry接口。
+ * 这个类主要作为BeanFactory实现的基类，分解了单例bean实例的通用管理.
+ * 请注意，ConfigurableBeanFactory接口扩展了SingletonBeanRegistry接口.
  *
  * <p>Note that this class assumes neither a bean definition concept
  * nor a specific creation process for bean instances, in contrast to
@@ -71,7 +71,7 @@ import org.springframework.util.StringUtils;
  * helper to delegate to.
  *
  * 请注意，与AbstractBeanFactory和DefaultListableBeanFactory（从中继承）相比，
- * 此类不假设bean定义概念或bean实例的特定创建过程。 也可以用作委托给的嵌套助手。
+ * 此类不假设bean定义概念或bean实例的特定创建过程. 也可以用作委托给的嵌套助手.
  *
  * @author Juergen Hoeller
  * @since 2.0
@@ -186,7 +186,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	/**
 	 * Add the given singleton object to the singleton cache of this factory.
-	 * 将给定的单例对象添加到该工厂的单例缓存中。
+	 * 将给定的单例对象添加到该工厂的单例缓存中.
 	 * <p>To be called for eager registration of singletons.
 	 * @param beanName the name of the bean 这个bean的名字
 	 * @param singletonObject the singleton object 给出的单例对象
@@ -209,7 +209,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	/**
 	 * Add the given singleton factory for building the specified singleton
 	 * if necessary.
-	 * 如有必要，添加给定的单例工厂来构建指定的单例。
+	 * 如有必要，添加给定的单例工厂来构建指定的单例.
 	 * <p>To be called for eager registration of singletons, e.g. to be able to
 	 * resolve circular references.
 	 * @param beanName the name of the bean 给定单例的名字

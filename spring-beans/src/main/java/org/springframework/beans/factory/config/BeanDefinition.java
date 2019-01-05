@@ -26,9 +26,13 @@ import org.springframework.lang.Nullable;
  * constructor argument values, and further information supplied by
  * concrete implementations.
  *
+ * BeanDefinition描述了一个bean实例，它具有属性值，构造函数参数值以及具体实现提供的更多信息.
+ *
  * <p>This is just a minimal interface: The main intention is to allow a
  * {@link BeanFactoryPostProcessor} such as {@link PropertyPlaceholderConfigurer}
  * to introspect and modify property values and other bean metadata.
+ *
+ * 这仅仅是一个最小的接口：主要目的是允许一个 BeanFactoryPostProcessor如PropertyPlaceholderConfigurer 内省和修改属性值和其他的bean的元数据.
  *
  * @author Juergen Hoeller
  * @author Rob Harrop

@@ -69,10 +69,11 @@ import org.springframework.util.xml.DomUtils;
 
 /**
  * Stateful delegate class used to parse XML bean definitions.
+ * 用于解析XML bean定义的有状态委托类.
  * Intended for use by both the main parser and any extension
  * {@link BeanDefinitionParser BeanDefinitionParsers} or
  * {@link BeanDefinitionDecorator BeanDefinitionDecorators}.
- *
+ * 旨在供主解析器和任何扩展 BeanDefinitionParsers或使用 BeanDefinitionDecorators.
  * @author Rob Harrop
  * @author Juergen Hoeller
  * @author Rod Johnson
@@ -399,6 +400,9 @@ public class BeanDefinitionParserDelegate {
 	 * Parses the supplied {@code <bean>} element. May return {@code null}
 	 * if there were errors during parse. Errors are reported to the
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 *
+	 * 解析提供的元素.null 如果在解析期间出现错误，可能会返回.错误报告给 ProblemReporter.
+	 *
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele) {
@@ -409,20 +413,33 @@ public class BeanDefinitionParserDelegate {
 	 * Parses the supplied {@code <bean>} element. May return {@code null}
 	 * if there were errors during parse. Errors are reported to the
 	 * {@link org.springframework.beans.factory.parsing.ProblemReporter}.
+	 *
+	 * 解析提供的元素.null 如果在解析期间出现错误，可能会返回.错误报告给 ProblemReporter.
+	 *
+	 * @param ele 元素
+	 * @param containingBean 一个描述bean的实例-containingBean
 	 */
 	@Nullable
 	public BeanDefinitionHolder parseBeanDefinitionElement(Element ele, @Nullable BeanDefinition containingBean) {
+		//获取bean标签中的id属性
 		String id = ele.getAttribute(ID_ATTRIBUTE);
+		//获取bean标签中的name属性
 		String nameAttr = ele.getAttribute(NAME_ATTRIBUTE);
 
 		List<String> aliases = new ArrayList<>();
+		//如果name属性不为空
 		if (StringUtils.hasLength(nameAttr)) {
+			//按照逗号、分号、空格进行分割
 			String[] nameArr = StringUtils.tokenizeToStringArray(nameAttr, MULTI_VALUE_ATTRIBUTE_DELIMITERS);
+			//添加到别名list中备用
 			aliases.addAll(Arrays.asList(nameArr));
 		}
 
+		//默认bean的名字是bean标签的id
 		String beanName = id;
+		//如果beanName为空，并且别名list不为空
 		if (!StringUtils.hasText(beanName) && !aliases.isEmpty()) {
+			//bean名为name属性中的第一个名字
 			beanName = aliases.remove(0);
 			if (logger.isTraceEnabled()) {
 				logger.trace("No XML 'id' specified - using '" + beanName +
@@ -474,6 +491,7 @@ public class BeanDefinitionParserDelegate {
 	/**
 	 * Validate that the specified bean name and aliases have not been used already
 	 * within the current level of beans element nesting.
+	 * 验证指定的bean名称和别名是否已在当前bean元素嵌套级别中使用.
 	 */
 	protected void checkNameUniqueness(String beanName, List<String> aliases, Element beanElement) {
 		String foundName = null;
@@ -1439,9 +1457,11 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Get the namespace URI for the supplied node.
+	 * 获取提供的节点的名称空间URI.
 	 * <p>The default implementation uses {@link Node#getNamespaceURI}.
 	 * Subclasses may override the default implementation to provide a
 	 * different namespace identification mechanism.
+	 * 默认实现使用Node.getNamespaceURI().子类可以覆盖默认实现以提供不同的命名空间标识机制.
 	 * @param node the node
 	 */
 	@Nullable
@@ -1451,9 +1471,15 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Get the local name for the supplied {@link Node}.
+	 *
+	 * 获取提供的本地名称Node.
+	 *
 	 * <p>The default implementation calls {@link Node#getLocalName}.
 	 * Subclasses may override the default implementation to provide a
 	 * different mechanism for getting the local name.
+	 *
+	 * 默认实现调用Node.getLocalName().子类可以覆盖默认实现，以提供获取本地名称的不同机制.
+	 *
 	 * @param node the {@code Node}
 	 */
 	public String getLocalName(Node node) {
@@ -1462,21 +1488,37 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Determine whether the name of the supplied node is equal to the supplied name.
+	 * 确定提供的节点的名称是否等于提供的名称.
 	 * <p>The default implementation checks the supplied desired name against both
 	 * {@link Node#getNodeName()} and {@link Node#getLocalName()}.
+	 *
+	 * 默认实现根据Node.getNodeName()和检查提供的所需名称 Node.getLocalName()
+	 *
 	 * <p>Subclasses may override the default implementation to provide a different
 	 * mechanism for comparing node names.
-	 * @param node the node to compare
-	 * @param desiredName the name to check for
+	 *
+	 * 子类可以覆盖默认实现，以提供用于比较节点名称的不同机制.
+	 * @param node the node to compare. 要比较的节点.
+	 * @param desiredName the name to check for. 要检查的名称.
 	 */
 	public boolean nodeNameEquals(Node node, String desiredName) {
 		return desiredName.equals(node.getNodeName()) || desiredName.equals(getLocalName(node));
 	}
 
+	/**
+	 * 检查传入的node是否是默认的命名空间
+	 * @param namespaceUri namespaceUri可以为空
+	 * @return 是否是默认的命名空间
+	 */
 	public boolean isDefaultNamespace(@Nullable String namespaceUri) {
 		return (!StringUtils.hasLength(namespaceUri) || BEANS_NAMESPACE_URI.equals(namespaceUri));
 	}
 
+	/**
+	 * 检查传入的node是否是默认的命名空间
+	 * @param node
+	 * @return 是否是默认的命名空间
+	 */
 	public boolean isDefaultNamespace(Node node) {
 		return isDefaultNamespace(getNamespaceURI(node));
 	}

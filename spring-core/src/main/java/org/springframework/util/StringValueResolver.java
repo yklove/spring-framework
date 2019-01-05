@@ -20,7 +20,7 @@ import org.springframework.lang.Nullable;
 
 /**
  * Simple strategy interface for resolving a String value.
- * 用于解析字符串值的简单策略接口。
+ * 用于解析字符串值的简单策略接口.
  * Used by {@link org.springframework.beans.factory.config.ConfigurableBeanFactory}.
  *
  * @author Juergen Hoeller
@@ -34,7 +34,7 @@ public interface StringValueResolver {
 
 	/**
 	 * Resolve the given String value, for example parsing placeholders.
-	 * 解析给定的字符串值，例如解析占位符。
+	 * 解析给定的字符串值，例如解析占位符.
 	 * Nullable 表示定义的字段可以为空.
 	 * @param strVal the original String value (never {@code null}) 原始的字符串(不为null)
 	 * @return the resolved String value (may be {@code null} when resolved to a null

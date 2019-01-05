@@ -18,8 +18,8 @@ package org.springframework.core;
 
 /**
  * Common interface for managing aliases. Serves as super-interface for
- * 管理别名的公共接口。
- * 可以对别名进行增删改查等操作。
+ * 管理别名的公共接口.
+ * 可以对别名进行增删改查等操作.
  * {@link org.springframework.beans.factory.support.BeanDefinitionRegistry}.
  *
  * @author Juergen Hoeller
@@ -47,9 +47,9 @@ public interface AliasRegistry {
 
 	/**
 	 * Determine whether this given name is defines as an alias
-	 * 确定给定的名称是否为别名。
+	 * 确定给定的名称是否为别名.
 	 * (as opposed to the name of an actually registered component 而不是实际注册的组件的名称).
-	 * <s>这个地方从备注中得到的信息有点疑惑，如果给出的名称没有被注册为别名(不是实际组件的名称,也不是别名)，会返回什么。</s>
+	 * <s>这个地方从备注中得到的信息有点疑惑，如果给出的名称没有被注册为别名(不是实际组件的名称,也不是别名)，会返回什么.</s>
 	 * @param name the name to check 要检查的名称
 	 * @return whether the given name is an alias 给定的名称是否是别名
 	 */
@@ -57,7 +57,7 @@ public interface AliasRegistry {
 
 	/**
 	 * Return the aliases for the given name, if defined.
-	 * 如果给定名称的别名已定义，则返回给定名称的别名。
+	 * 如果给定名称的别名已定义，则返回给定名称的别名.
 	 * @param name the name to check for aliases 要检查别名的名称
 	 * @return the aliases, or an empty array if none 返回别名,如果没有返回空
 	 */

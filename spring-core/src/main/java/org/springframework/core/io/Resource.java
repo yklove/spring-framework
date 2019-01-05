@@ -54,7 +54,7 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Determine whether this resource actually exists in physical form.
      *
-     * 确定该资源实际上是否以物理形式存在。
+     * 确定该资源实际上是否以物理形式存在.
      *
 	 * <p>This method performs a definitive existence check, whereas the
 	 * existence of a {@code Resource} handle only guarantees a valid
@@ -83,7 +83,7 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Indicate whether this resource represents a handle with an open stream.
      *
-     * 指示此资源是否表示具有公开流的句柄。
+     * 指示此资源是否表示具有公开流的句柄.
      *
      * If {@code true}, the InputStream cannot be read multiple times,
 	 * and must be read and closed to avoid resource leaks.
@@ -98,7 +98,7 @@ public interface Resource extends InputStreamSource {
 	 * A value of {@code true} strongly suggests (but does not guarantee)
 	 * that a {@link #getFile()} call will succeed.
      *
-     * 确定此资源是否代表文件系统中的文件。
+     * 确定此资源是否代表文件系统中的文件.
      *
 	 * <p>This is conservatively {@code false} by default.
 	 * @since 5.0
@@ -111,7 +111,7 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Return a URL handle for this resource.
      *
-     * 返回此资源的URL句柄。
+     * 返回此资源的URL句柄.
      *
 	 * @throws IOException if the resource cannot be resolved as URL,
 	 * i.e. if the resource is not available as descriptor
@@ -121,7 +121,7 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Return a URI handle for this resource.
      *
-     * 返回此资源的URI句柄。
+     * 返回此资源的URI句柄.
      *
 	 * @throws IOException if the resource cannot be resolved as URI,
 	 * i.e. if the resource is not available as descriptor
@@ -132,7 +132,7 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Return a File handle for this resource.
      *
-     * 为这个资源返回一个文件句柄。
+     * 为这个资源返回一个文件句柄.
      *
 	 * @throws java.io.FileNotFoundException if the resource cannot be resolved as
 	 * absolute file path, i.e. if the resource is not available in a file system
@@ -144,7 +144,7 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Return a {@link ReadableByteChannel}.
      *
-     * 返回一个ReadableByteChannel。
+     * 返回一个ReadableByteChannel.
      *
 	 * <p>It is expected that each call creates a <i>fresh</i> channel.
 	 * <p>The default implementation returns {@link Channels#newChannel(InputStream)}
@@ -162,7 +162,7 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Determine the content length for this resource.
      *
-     * 确定此资源的内容长度。
+     * 确定此资源的内容长度.
      *
 	 * @throws IOException if the resource cannot be resolved
 	 * (in the file system or as some other known physical resource type)
@@ -172,7 +172,7 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Determine the last-modified timestamp for this resource.
      *
-     * 确定此资源的上次修改时间戳。
+     * 确定此资源的上次修改时间戳.
      *
 	 * @throws IOException if the resource cannot be resolved
 	 * (in the file system or as some other known physical resource type)
@@ -182,7 +182,7 @@ public interface Resource extends InputStreamSource {
 	/**
 	 * Create a resource relative to this resource.
      *
-     * 创建一个相对于这个资源的资源。
+     * 创建一个相对于这个资源的资源.
      *
 	 * @param relativePath the relative path (relative to this resource)
 	 * @return the resource handle for the relative resource
@@ -194,7 +194,7 @@ public interface Resource extends InputStreamSource {
 	 * Determine a filename for this resource, i.e. typically the last
 	 * part of the path: for example, "myfile.txt".
      *
-     * 确定此资源的文件名，即通常为路径的最后部分：例如“myfile.txt”。
+     * 确定此资源的文件名，即通常为路径的最后部分：例如“myfile.txt”.
      *
 	 * <p>Returns {@code null} if this type of resource does not
 	 * have a filename.
@@ -206,7 +206,7 @@ public interface Resource extends InputStreamSource {
 	 * Return a description for this resource,
 	 * to be used for error output when working with the resource.
      *
-     * 返回此资源的描述，用于处理资源时的错误输出。
+     * 返回此资源的描述，用于处理资源时的错误输出.
      *
 	 * <p>Implementations are also encouraged to return this value
 	 * from their {@code toString} method.
