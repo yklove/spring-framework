@@ -238,6 +238,10 @@ public class BeanDefinitionParserDelegate {
 	 * Stores all used bean names so we can enforce uniqueness on a per
 	 * beans-element basis. Duplicate bean ids/names may not exist within the
 	 * same level of beans element nesting, but may be duplicated across levels.
+	 *
+	 * 存储所有使用过的bean名称，以便我们可以在每个beans-element的基础上强制实现唯一性.
+	 * 重复的bean的Id或者别名可能不存在于相同级别的bean元素嵌套中，但可能跨级别重复.
+	 *
 	 */
 	private final Set<String> usedNames = new HashSet<>();
 
@@ -496,12 +500,15 @@ public class BeanDefinitionParserDelegate {
 	protected void checkNameUniqueness(String beanName, List<String> aliases, Element beanElement) {
 		String foundName = null;
 
+		//如果beanName不为空，并且beanName包含于usedNames中
 		if (StringUtils.hasText(beanName) && this.usedNames.contains(beanName)) {
 			foundName = beanName;
 		}
-		if (foundName == null) {
+		if (foundName == null) {  
+			//寻找别名集合中在usedNames集合中第一个相同的对象
 			foundName = CollectionUtils.findFirstMatch(this.usedNames, aliases);
 		}
+		//如果寻找到了，则认为已经在别的bean元素中使用过了，???这个error？？
 		if (foundName != null) {
 			error("Bean name '" + foundName + "' is already used in this <beans> element", beanElement);
 		}

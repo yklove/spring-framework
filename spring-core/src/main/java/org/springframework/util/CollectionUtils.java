@@ -197,9 +197,11 @@ public abstract class CollectionUtils {
 	 * '{@code source}'. If no element in '{@code candidates}' is present in
 	 * '{@code source}' returns {@code null}. Iteration order is
 	 * {@link Collection} implementation specific.
-	 * @param source the source Collection
-	 * @param candidates the candidates to search for
-	 * @return the first present object, or {@code null} if not found
+	 * 返回'candidates'中包含的'source'中的第一个元素。如果'candidates'中没有'source'中的元素则返回null.
+	 * 迭代顺序是 Collection特定于实现的.
+	 * @param source the source Collection. 源集合
+	 * @param candidates the candidates to search for.
+	 * @return the first present object, or {@code null} if not found. 返回第一个匹配的对象，如果没有找到则是null
 	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
