@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2018 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -122,7 +122,9 @@ public interface DataBuffer {
 	 * @return this buffer
 	 * @since 5.1.4
 	 */
-	DataBuffer ensureCapacity(int capacity);
+	default DataBuffer ensureCapacity(int capacity) {
+		return this;
+	}
 
 	/**
 	 * Return the position from which this buffer will read.
@@ -242,32 +244,34 @@ public interface DataBuffer {
 	 * @since 5.1.4
 	 */
 	default DataBuffer write(CharSequence charSequence, Charset charset) {
-		Assert.notNull(charSequence, "'charSequence' must not be null");
-		Assert.notNull(charset, "'charset' must not be null");
-		CharsetEncoder charsetEncoder = charset.newEncoder()
-				.onMalformedInput(CodingErrorAction.REPLACE)
-				.onUnmappableCharacter(CodingErrorAction.REPLACE);
-		CharBuffer inBuffer = CharBuffer.wrap(charSequence);
-		int estimatedSize = (int) (inBuffer.remaining() * charsetEncoder.averageBytesPerChar());
-		ByteBuffer outBuffer = ensureCapacity(estimatedSize)
-				.asByteBuffer(writePosition(), writableByteCount());
-		for (; ; ) {
-			CoderResult cr = inBuffer.hasRemaining() ?
-					charsetEncoder.encode(inBuffer, outBuffer, true) : CoderResult.UNDERFLOW;
-			if (cr.isUnderflow()) {
-				cr = charsetEncoder.flush(outBuffer);
+		Assert.notNull(charSequence, "CharSequence must not be null");
+		Assert.notNull(charset, "Charset must not be null");
+		if (charSequence.length() != 0) {
+			CharsetEncoder charsetEncoder = charset.newEncoder()
+					.onMalformedInput(CodingErrorAction.REPLACE)
+					.onUnmappableCharacter(CodingErrorAction.REPLACE);
+			CharBuffer inBuffer = CharBuffer.wrap(charSequence);
+			int estimatedSize = (int) (inBuffer.remaining() * charsetEncoder.averageBytesPerChar());
+			ByteBuffer outBuffer = ensureCapacity(estimatedSize)
+					.asByteBuffer(writePosition(), writableByteCount());
+			while (true) {
+				CoderResult cr = (inBuffer.hasRemaining() ?
+						charsetEncoder.encode(inBuffer, outBuffer, true) : CoderResult.UNDERFLOW);
+				if (cr.isUnderflow()) {
+					cr = charsetEncoder.flush(outBuffer);
+				}
+				if (cr.isUnderflow()) {
+					break;
+				}
+				if (cr.isOverflow()) {
+					writePosition(outBuffer.position());
+					int maximumSize = (int) (inBuffer.remaining() * charsetEncoder.maxBytesPerChar());
+					ensureCapacity(maximumSize);
+					outBuffer = asByteBuffer(writePosition(), writableByteCount());
+				}
 			}
-			if (cr.isUnderflow()) {
-				break;
-			}
-			if (cr.isOverflow()) {
-				writePosition(outBuffer.position());
-				int maximumSize = (int) (inBuffer.remaining() * charsetEncoder.maxBytesPerChar());
-				ensureCapacity(maximumSize);
-				outBuffer = asByteBuffer(writePosition(), writableByteCount());
-			}
+			writePosition(outBuffer.position());
 		}
-		writePosition(outBuffer.position());
 		return this;
 	}
 
