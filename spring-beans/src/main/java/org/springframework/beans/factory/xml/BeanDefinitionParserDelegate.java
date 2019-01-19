@@ -512,7 +512,7 @@ public class BeanDefinitionParserDelegate {
 		if (foundName != null) {
 			error("Bean name '" + foundName + "' is already used in this <beans> element", beanElement);
 		}
-
+		//将beanName和所有的别名增加到usedNames中
 		this.usedNames.add(beanName);
 		this.usedNames.addAll(aliases);
 	}
