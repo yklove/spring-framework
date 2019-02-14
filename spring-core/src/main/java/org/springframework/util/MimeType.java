@@ -103,6 +103,9 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 
 	private final Map<String, String> parameters;
 
+	@Nullable
+	private volatile String toStringValue;
+
 
 	/**
 	 * Create a new {@code MimeType} for the given primary type.
@@ -469,9 +472,14 @@ public class MimeType implements Comparable<MimeType>, Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		appendTo(builder);
-		return builder.toString();
+		String value = this.toStringValue;
+		if (value == null) {
+			StringBuilder builder = new StringBuilder();
+			appendTo(builder);
+			value = builder.toString();
+			this.toStringValue = value;
+		}
+		return value;
 	}
 
 	protected void appendTo(StringBuilder builder) {

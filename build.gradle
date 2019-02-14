@@ -11,7 +11,7 @@ buildscript {
 // 3rd party plugin repositories can be configured in settings.gradle
 plugins {
 	id "io.spring.dependency-management" version "1.0.5.RELEASE" apply false
-	id "org.jetbrains.kotlin.jvm" version "1.3.20" apply false
+	id "org.jetbrains.kotlin.jvm" version "1.3.21" apply false
 	id "org.jetbrains.dokka" version "0.9.17"
 	id "org.asciidoctor.convert" version "1.5.8"
 }
@@ -30,21 +30,21 @@ ext {
 
 	aspectjVersion       = "1.9.2"
 	freemarkerVersion    = "2.3.28"
-	groovyVersion        = "2.5.5"
+	groovyVersion        = "2.5.6"
 	hsqldbVersion        = "2.4.1"
 	jackson2Version      = "2.9.8"
 	jettyVersion         = "9.4.14.v20181114"
-	junit5Version        = "5.4.0-RC2"
-	kotlinVersion        = "1.3.20"
-	log4jVersion         = "2.11.1"
+	junit5Version        = "5.4.0"
+	kotlinVersion        = "1.3.21"
+	log4jVersion         = "2.11.2"
 	nettyVersion         = "4.1.33.Final"
-	reactorVersion       = "Californium-SR4"
+	reactorVersion       = "Californium-SR5"
 	rxjavaVersion        = "1.3.8"
 	rxjavaAdapterVersion = "1.2.1"
 	rxjava2Version       = "2.2.6"
 	slf4jVersion         = "1.7.25"	  // spring-jcl + consistent 3rd party deps
 	tiles3Version        = "3.0.8"
-	tomcatVersion        = "9.0.14"
+	tomcatVersion        = "9.0.16"
 	undertowVersion      = "2.0.17.Final"
 
 	gradleScriptDir = "${rootProject.projectDir}/gradle"
@@ -143,27 +143,24 @@ configure(allprojects) { project ->
 	}
 
 	checkstyle {
-		toolVersion = "8.16"
+		toolVersion = "8.17"
 		configDir = rootProject.file("src/checkstyle")
 	}
 
 	repositories {
 		mavenLocal()
 		maven { url "https://repo.spring.io/libs-release" }
+		maven { url "https://repo.spring.io/snapshot" } // Reactor
 	}
 
 	dependencies {
 		testCompile("junit:junit:4.12") {
 			exclude group: "org.hamcrest", module: "hamcrest-core"
 		}
-		testCompile("org.mockito:mockito-core:2.23.4") {
+		testCompile("org.mockito:mockito-core:2.24.0") {
 			exclude group: "org.hamcrest", module: "hamcrest-core"
 		}
-		testCompile("com.nhaarman:mockito-kotlin:1.6.0") {
-			exclude module: "kotlin-stdlib"
-			exclude module: "kotlin-reflect"
-			exclude module: "mockito-core"
-		}
+		testCompile("io.mockk:mockk:1.9")
 		testCompile("org.hamcrest:hamcrest-all:1.3")
 		testRuntime("org.apache.logging.log4j:log4j-core:${log4jVersion}")
 		testRuntime("org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}")
@@ -280,7 +277,7 @@ configure(rootProject) {
 		testCompile("javax.servlet:javax.servlet-api:3.1.0")
 		testCompile("org.aspectj:aspectjweaver:${aspectjVersion}")
 		testCompile("org.hsqldb:hsqldb:${hsqldbVersion}")
-		testCompile("org.hibernate:hibernate-core:5.1.16.Final")
+		testCompile("org.hibernate:hibernate-core:5.1.17.Final")
 	}
 
 	artifacts {

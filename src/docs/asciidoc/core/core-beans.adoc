@@ -163,7 +163,6 @@ The following example shows the basic structure of XML-based configuration metad
 <2> The `class` attribute defines the type of the bean and uses the fully qualified
 classname.
 
-
 The value of the `id` attribute refers to collaborating objects. The XML for
 referring to collaborating objects is not shown in this example. See
 <<beans-dependencies,Dependencies>> for more information.
@@ -1044,7 +1043,8 @@ load an entire Spring IoC container instance.
 Since you can mix constructor-based and setter-based DI, it is a good rule of thumb to
 use constructors for mandatory dependencies and setter methods or configuration methods
 for optional dependencies. Note that use of the <<beans-required-annotation,@Required>>
-annotation on a setter method can be used to make the property be a required dependency.
+annotation on a setter method can be used to make the property be a required dependency;
+however, constructor injection with programmatic validation of arguments is preferable.
 
 The Spring team generally advocates constructor injection, as it lets you implement
 application components as immutable objects and ensures that required dependencies
@@ -1076,8 +1076,8 @@ The container performs bean dependency resolution as follows:
   describes all the beans. Configuration metadata can be specified by XML, Java code, or
   annotations.
 * For each bean, its dependencies are expressed in the form of properties, constructor
-  arguments, or arguments to the static-factory method( if you use that instead of
-  a normal constructor). These dependencies are provided to the bean, when the bean is
+  arguments, or arguments to the static-factory method (if you use that instead of a
+  normal constructor). These dependencies are provided to the bean, when the bean is
   actually created.
 * Each property or constructor argument is an actual definition of the value to set, or
   a reference to another bean in the container.
@@ -1354,7 +1354,7 @@ You can also configure a `java.util.Properties` instance, as follows:
 [subs="verbatim,quotes"]
 ----
 	<bean id="mappings"
-		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 
 		<!-- typed as a java.util.Properties -->
 		<property name="properties">
@@ -3070,8 +3070,8 @@ of a bean. This section groups them as follows:
 [[beans-factory-lifecycle]]
 === Lifecycle Callbacks
 
-To interact with the container's management of the bean lifecycle, you can implement the
-Spring `InitializingBean` and `DisposableBean` interfaces. The container calls
+To interact with the container's management of the bean lifecycle, you can implement
+the Spring `InitializingBean` and `DisposableBean` interfaces. The container calls
 `afterPropertiesSet()` for the former and `destroy()` for the latter to let the bean
 perform certain actions upon initialization and destruction of your beans.
 
@@ -3079,11 +3079,11 @@ perform certain actions upon initialization and destruction of your beans.
 ====
 The JSR-250 `@PostConstruct` and `@PreDestroy` annotations are generally considered best
 practice for receiving lifecycle callbacks in a modern Spring application. Using these
-annotations means that your beans are not coupled to Spring-specific interfaces. For
-details, see <<beans-postconstruct-and-predestroy-annotations>>.
+annotations means that your beans are not coupled to Spring-specific interfaces.
+For details, see <<beans-postconstruct-and-predestroy-annotations>>.
 
 If you do not want to use the JSR-250 annotations but you still want to remove
-coupling, consider using of `init-method` and `destroy-method` object definition metadata.
+coupling, consider `init-method` and `destroy-method` bean definition metadata.
 ====
 
 Internally, the Spring Framework uses `BeanPostProcessor` implementations to process any
@@ -3097,7 +3097,6 @@ also implement the `Lifecycle` interface so that those objects can participate i
 startup and shutdown process, as driven by the container's own lifecycle.
 
 The lifecycle callback interfaces are described in this section.
-
 
 
 [[beans-factory-lifecycle-initializingbean]]
@@ -3138,8 +3137,8 @@ no-argument signature. With Java configuration, you can use the `initMethod` att
 	}
 ----
 
-The preceding example has almost exactly the same effect as the following example (which
-consists of two listings):
+The preceding example has almost exactly the same effect as the following example
+(which consists of two listings):
 
 [source,xml,indent=0]
 [subs="verbatim,quotes"]
@@ -3980,19 +3979,19 @@ to work with bean instances within a `BeanFactoryPostProcessor` (for example, by
 standard container lifecycle. This may cause negative side effects, such as bypassing
 bean post processing.
 
-Also, `BeanFactoryPostProcessor` instances are scoped per-container. This is only relevant if
-you use container hierarchies. If you define a `BeanFactoryPostProcessor` in one
-container, it is applied only to the bean definitions in that container. Bean
-definitions in one container are not post-processed by `BeanFactoryPostProcessor` instances
-in another container, even if both containers are part of the same hierarchy.
+Also, `BeanFactoryPostProcessor` instances are scoped per-container. This is only relevant
+if you use container hierarchies. If you define a `BeanFactoryPostProcessor` in one
+container, it is applied only to the bean definitions in that container. Bean definitions
+in one container are not post-processed by `BeanFactoryPostProcessor` instances in another
+container, even if both containers are part of the same hierarchy.
 ====
 
 A bean factory post-processor is automatically executed when it is declared inside an
 `ApplicationContext`, in order to apply changes to the configuration metadata that
 define the container. Spring includes a number of predefined bean factory
 post-processors, such as `PropertyOverrideConfigurer` and
-`PropertyPlaceholderConfigurer`. You can also use a custom `BeanFactoryPostProcessor` --
-for example, to register custom property editors.
+`PropertySourcesPlaceholderConfigurer`. You can also use a custom `BeanFactoryPostProcessor`
+-- for example, to register custom property editors.
 
 An `ApplicationContext` automatically detects any beans that are deployed into it that
 implement the `BeanFactoryPostProcessor` interface. It uses these beans as bean factory
@@ -4008,13 +4007,13 @@ Thus, marking it for lazy initialization will be ignored, and the
 
 
 [[beans-factory-placeholderconfigurer]]
-==== Example: The Class Name Substitution `PropertyPlaceholderConfigurer`
+==== Example: The Class Name Substitution `PropertySourcesPlaceholderConfigurer`
 
-You can use the `PropertyPlaceholderConfigurer` to externalize property values from a bean
-definition in a separate file by using the standard Java `Properties` format. Doing so
-enables the person deploying an application to customize environment-specific properties,
-such as database URLs and passwords, without the complexity or risk of modifying the
-main XML definition file or files for the container.
+You can use the `PropertySourcesPlaceholderConfigurer` to externalize property values
+from a bean definition in a separate file by using the standard Java `Properties` format.
+Doing so enables the person deploying an application to customize environment-specific
+properties, such as database URLs and passwords, without the complexity or risk of
+modifying the main XML definition file or files for the container.
 
 Consider the following XML-based configuration metadata fragment, where a `DataSource`
 with placeholder values is defined:
@@ -4022,7 +4021,7 @@ with placeholder values is defined:
 [source,xml,indent=0]
 [subs="verbatim,quotes"]
 ----
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
 		<property name="locations" value="classpath:com/something/jdbc.properties"/>
 	</bean>
 
@@ -4035,11 +4034,10 @@ with placeholder values is defined:
 	</bean>
 ----
 
-The example shows properties configured from an
-external `Properties` file. At runtime, a `PropertyPlaceholderConfigurer` is applied to
-the metadata that replaces some properties of the DataSource. The values to replace
-are specified as placeholders of the form `${property-name}`, which follows the Ant and
-log4j and JSP EL style.
+The example shows properties configured from an external `Properties` file. At runtime,
+a `PropertySourcesPlaceholderConfigurer` is applied to the metadata that replaces some
+properties of the DataSource. The values to replace are specified as placeholders of the
+form `${property-name}`, which follows the Ant and log4j and JSP EL style.
 
 The actual values come from another file in the standard Java `Properties` format:
 
@@ -4054,12 +4052,12 @@ jdbc.password=root
 
 Therefore, the `${jdbc.username}` string is replaced at runtime with the value, 'sa', and
 the same applies for other placeholder values that match keys in the properties file.
-The `PropertyPlaceholderConfigurer` checks for placeholders in most properties and
+The `PropertySourcesPlaceholderConfigurer` checks for placeholders in most properties and
 attributes of a bean definition. Furthermore, you can customize the placeholder prefix and suffix.
 
-With the `context` namespace introduced in Spring 2.5, you can configure
-property placeholders with a dedicated configuration element. You can provide one or more locations
-as a comma-separated list in the `location` attribute, as the following example shows:
+With the `context` namespace introduced in Spring 2.5, you can configure property placeholders
+with a dedicated configuration element. You can provide one or more locations as a
+comma-separated list in the `location` attribute, as the following example shows:
 
 [source,xml,indent=0]
 [subs="verbatim,quotes"]
@@ -4067,30 +4065,20 @@ as a comma-separated list in the `location` attribute, as the following example 
 	<context:property-placeholder location="classpath:com/something/jdbc.properties"/>
 ----
 
-The `PropertyPlaceholderConfigurer` not only looks for properties in the `Properties`
-file you specify. By default,  if it
-cannot find a property in the specified properties files, it also checks against the Java `System` properties. You can customize this
-behavior by setting the `systemPropertiesMode` property of the configurer with one of
-the following three supported integer values:
-
-* `never` (0): Never check system properties.
-* `fallback` (1): Check system properties if not resolvable in the specified
-  properties files. This is the default.
-* `override` (2): Check system properties first, before trying the specified
-  properties files. This lets system properties override any other property source.
-
-See the {api-spring-framework}/beans/factory/config/PropertyPlaceholderConfigurer.html[`PropertyPlaceholderConfigurer`] javadoc for more information.
+The `PropertySourcesPlaceholderConfigurer` not only looks for properties in the `Properties`
+file you specify. By default, if it cannot find a property in the specified properties files,
+it checks against Spring `Environment` properties and regular Java `System` properties.
 
 [TIP]
 =====
-You can use the `PropertyPlaceholderConfigurer` to substitute class names, which is
-sometimes useful when you have to pick a particular implementation class at runtime. The
-following example shows how to do so:
+You can use the `PropertySourcesPlaceholderConfigurer` to substitute class names, which
+is sometimes useful when you have to pick a particular implementation class at runtime.
+The following example shows how to do so:
 
 [source,xml,indent=0]
 [subs="verbatim,quotes"]
 ----
-	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<bean class="org.springframework.beans.factory.config.PropertySourcesPlaceholderConfigurer">
 		<property name="locations">
 			<value>classpath:com/something/strategy.properties</value>
 		</property>
@@ -4112,8 +4100,8 @@ phase of an `ApplicationContext` for a non-lazy-init bean.
 ==== Example: The `PropertyOverrideConfigurer`
 
 The `PropertyOverrideConfigurer`, another bean factory post-processor, resembles the
-`PropertyPlaceholderConfigurer`, but unlike the latter, the original definitions can
-have default values or no values at all for bean properties. If an overriding
+`PropertySourcesPlaceholderConfigurer`, but unlike the latter, the original definitions
+can have default values or no values at all for bean properties. If an overriding
 `Properties` file does not have an entry for a certain bean property, the default
 context definition is used.
 
@@ -4313,10 +4301,17 @@ example:
 This annotation indicates that the affected bean property must be populated at
 configuration time, through an explicit property value in a bean definition or through
 autowiring. The container throws an exception if the affected bean property has not been
-populated. This allows for eager and explicit failure, avoiding `NullPointerException` instances
-or the like later on. We still recommend that you put assertions into the bean
-class itself (for example, into an init method). Doing so enforces those required
+populated. This allows for eager and explicit failure, avoiding `NullPointerException`
+instances or the like later on. We still recommend that you put assertions into the
+bean class itself (for example, into an init method). Doing so enforces those required
 references and values even when you use the class outside of a container.
+
+[NOTE]
+====
+The `@Required` annotation is formally deprecated as of Spring Framework 5.1, in favor
+of using constructor injection for required settings (or a custom implementation of
+`InitializingBean.afterPropertiesSet()` along with bean property setter methods).
+====
 
 
 
@@ -5149,14 +5144,14 @@ attribute set to `true`, it is selected.
 [[beans-resource-annotation]]
 === Injection with `@Resource`
 
-Spring also supports injection by using the JSR-250 `@Resource` annotation on fields or
-bean property setter methods. This is a common pattern in Java EE 5 and 6 (for example,
-in JSF 1.2 managed beans or JAX-WS 2.0 endpoints). Spring supports this pattern for
-Spring-managed objects as well.
+Spring also supports injection by using the JSR-250 `@Resource` annotation
+(`javax.annotation.Resource`) on fields or bean property setter methods.
+This is a common pattern in Java EE: for example, in JSF-managed beans and JAX-WS
+endpoints. Spring supports this pattern for Spring-managed objects as well.
 
-`@Resource` takes a name attribute. By default, Spring interprets that value as the
-bean name to be injected. In other words, it follows by-name semantics, as
-demonstrated in the following example:
+`@Resource` takes a name attribute. By default, Spring interprets that value as
+the bean name to be injected. In other words, it follows by-name semantics,
+as demonstrated in the following example:
 
 [source,java,indent=0]
 [subs="verbatim,quotes"]
@@ -5207,7 +5202,7 @@ and resolves well known resolvable dependencies: the `BeanFactory`,
 interfaces.
 
 Thus, in the following example, the `customerPreferenceDao` field first looks for a bean
-named customerPreferenceDao and then falls back to a primary type match for the type
+named "customerPreferenceDao" and then falls back to a primary type match for the type
 `CustomerPreferenceDao`:
 
 [source,java,indent=0]
@@ -5236,15 +5231,16 @@ named customerPreferenceDao and then falls back to a primary type match for the 
 === Using `@PostConstruct` and `@PreDestroy`
 
 The `CommonAnnotationBeanPostProcessor` not only recognizes the `@Resource` annotation
-but also the JSR-250 lifecycle annotations. Introduced in Spring 2.5, the support
-for these annotations offers yet another alternative to those described in
+but also the JSR-250 lifecycle annotations: `javax.annotation.PostConstruct` and
+`javax.annotation.PreDestroy`. Introduced in Spring 2.5, the support for these
+annotations offers an alternative to the lifecycle callback mechanism described in
 <<beans-factory-lifecycle-initializingbean,initialization callbacks>> and
 <<beans-factory-lifecycle-disposablebean,destruction callbacks>>. Provided that the
-`CommonAnnotationBeanPostProcessor` is registered within the Spring
-`ApplicationContext`, a method carrying one of these annotations is invoked at the same
-point in the lifecycle as the corresponding Spring lifecycle interface method or
-explicitly declared callback method. In the following example, the cache is
-pre-populated upon initialization and cleared upon destruction:
+`CommonAnnotationBeanPostProcessor` is registered within the Spring `ApplicationContext`,
+a method carrying one of these annotations is invoked at the same point in the lifecycle
+as the corresponding Spring lifecycle interface method or explicitly declared callback
+method. In the following example, the cache is pre-populated upon initialization and
+cleared upon destruction:
 
 [source,java,indent=0]
 [subs="verbatim,quotes"]
@@ -5263,8 +5259,18 @@ pre-populated upon initialization and cleared upon destruction:
 	}
 ----
 
-NOTE: For details about the effects of combining various lifecycle mechanisms, see
+For details about the effects of combining various lifecycle mechanisms, see
 <<beans-factory-lifecycle-combined-effects>>.
+
+[NOTE]
+====
+Like `@Resource`, the `@PostConstruct` and `@PreDestroy` annotation types were a part
+of the standard Java libraries from JDK 6 to 8. However, the entire `javax.annotation`
+package got separated from the core Java modules in JDK 9 and eventually removed in
+JDK 11. If needed, the `javax.annotation-api` artifact needs to be obtained via Maven
+Central now, simply to be added to the application's classpath like any other library.
+====
+
 
 
 
@@ -6722,8 +6728,8 @@ The following example shows how to prevent an automatic destruction callback for
 	}
 ----
 
-Also, with `@Bean` methods, you typically use programmatic JNDI lookups,
-either by using Spring's `JndiTemplate` or `JndiLocatorDelegate` helpers or straight JNDI
+Also, with `@Bean` methods, you typically use programmatic JNDI lookups, either by
+using Spring's `JndiTemplate` or `JndiLocatorDelegate` helpers or straight JNDI
 `InitialContext` usage but not the `JndiObjectFactoryBean` variant (which would force
 you to declare the return type as the `FactoryBean` type instead of the actual target
 type, making it harder to use for cross-reference calls in other `@Bean` methods that
@@ -6790,7 +6796,7 @@ Spring offers a convenient way of working with scoped dependencies through
 <<beans-factory-scopes-other-injection,scoped proxies>>. The easiest way to create such
 a proxy when using the XML configuration is the `<aop:scoped-proxy/>` element.
 Configuring your beans in Java with a `@Scope` annotation offers equivalent support with
-the `proxyMode` attribute. The default is no proxy ( `ScopedProxyMode.NO`), but you can
+the `proxyMode` attribute. The default is no proxy (`ScopedProxyMode.NO`), but you can
 specify `ScopedProxyMode.TARGET_CLASS` or `ScopedProxyMode.INTERFACES`.
 
 If you port the scoped proxy example from the XML reference documentation (see
@@ -8847,9 +8853,9 @@ exist, the listener uses `/WEB-INF/applicationContext.xml` as a default. When th
 parameter does exist, the listener separates the `String` by using predefined
 delimiters (comma, semicolon, and whitespace) and uses the values as locations where
 application contexts are searched. Ant-style path patterns are supported as well.
-Examples are `/WEB-INF/{asterisk}Context.xml` (for all files with names that end with `Context.xml`
-and that reside in the `WEB-INF` directory) and `/WEB-INF/**/*Context.xml`( for all such files
-in any subdirectory of `WEB-INF`).
+Examples are `/WEB-INF/{asterisk}Context.xml` (for all files with names that end with
+`Context.xml` and that reside in the `WEB-INF` directory) and `/WEB-INF/**/*Context.xml`
+(for all such files in any subdirectory of `WEB-INF`).
 
 
 
@@ -8860,17 +8866,17 @@ It is possible to deploy a Spring `ApplicationContext` as a RAR file, encapsulat
 context and all of its required bean classes and library JARs in a Java EE RAR deployment
 unit. This is the equivalent of bootstrapping a stand-alone `ApplicationContext` (only hosted
 in Java EE environment) being able to access the Java EE servers facilities. RAR deployment
-is a more natural alternative to a scenario of deploying a headless WAR file -- in effect, a WAR
-file without any HTTP entry points that is used only for bootstrapping a Spring
+is a more natural alternative to a scenario of deploying a headless WAR file -- in effect,
+a WAR file without any HTTP entry points that is used only for bootstrapping a Spring
 `ApplicationContext` in a Java EE environment.
 
 RAR deployment is ideal for application contexts that do not need HTTP entry points but
 rather consist only of message endpoints and scheduled jobs. Beans in such a context can
 use application server resources such as the JTA transaction manager and JNDI-bound JDBC
-`DataSource` instances and JMS `ConnectionFactory` instances and can also register with the
-platform's JMX server -- all through Spring's standard transaction management and JNDI
-and JMX support facilities. Application components can also interact with the
-application server's JCA `WorkManager` through Spring's `TaskExecutor` abstraction.
+`DataSource` instances and JMS `ConnectionFactory` instances and can also register with
+the platform's JMX server -- all through Spring's standard transaction management and JNDI
+and JMX support facilities. Application components can also interact with the application
+server's JCA `WorkManager` through Spring's `TaskExecutor` abstraction.
 
 See the javadoc of the
 {api-spring-framework}/jca/context/SpringContextResourceAdapter.html[`SpringContextResourceAdapter`]
@@ -8889,13 +8895,13 @@ and the corresponding Spring XML bean definition file(s) (typically
 . Drop the resulting RAR file into your
 application server's deployment directory.
 
-NOTE: Such RAR deployment units are usually self-contained. They do not expose components to
-the outside world, not even to other modules of the same application. Interaction with a
+NOTE: Such RAR deployment units are usually self-contained. They do not expose components
+to the outside world, not even to other modules of the same application. Interaction with a
 RAR-based `ApplicationContext` usually occurs through JMS destinations that it shares with
 other modules. A RAR-based `ApplicationContext` may also, for example, schedule some jobs
 or react to new files in the file system (or the like). If it needs to allow synchronous
-access from the outside, it could (for example) export RMI endpoints, which may
-be used by other application modules on the same machine.
+access from the outside, it could (for example) export RMI endpoints, which may be used
+by other application modules on the same machine.
 
 
 
@@ -9012,7 +9018,7 @@ you need to call its `postProcessBeanFactory` method, as the following example s
 	reader.loadBeanDefinitions(new FileSystemResource("beans.xml"));
 
 	// bring in some property values from a Properties file
-	PropertyPlaceholderConfigurer cfg = new PropertyPlaceholderConfigurer();
+	PropertySourcesPlaceholderConfigurer cfg = new PropertySourcesPlaceholderConfigurer();
 	cfg.setLocation(new FileSystemResource("jdbc.properties"));
 
 	// now actually do the replacement
