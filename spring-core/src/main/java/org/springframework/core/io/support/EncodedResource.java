@@ -32,6 +32,8 @@ import org.springframework.util.ObjectUtils;
  * Holder that combines a {@link Resource} descriptor with a specific encoding
  * or {@code Charset} to be used for reading from the resource.
  *
+ * 将{@link Resource}描述符与特定编码或{@code Charset}组合在一起的持有者，用于从资源中读取。
+ *
  * <p>Used as an argument for operations that support reading content with
  * a specific encoding, typically via a {@code java.io.Reader}.
  *
@@ -56,6 +58,9 @@ public class EncodedResource implements InputStreamSource {
 	/**
 	 * Create a new {@code EncodedResource} for the given {@code Resource},
 	 * not specifying an explicit encoding or {@code Charset}.
+	 *
+	 * 为给定的资源创建一个新的EncodedResource,不指定编码和字符集的情况下.
+	 *
 	 * @param resource the {@code Resource} to hold (never {@code null})
 	 */
 	public EncodedResource(Resource resource) {
@@ -84,6 +89,7 @@ public class EncodedResource implements InputStreamSource {
 
 	private EncodedResource(Resource resource, @Nullable String encoding, @Nullable Charset charset) {
 		super();
+		//传入的资源不能为空
 		Assert.notNull(resource, "Resource must not be null");
 		this.resource = resource;
 		this.encoding = encoding;

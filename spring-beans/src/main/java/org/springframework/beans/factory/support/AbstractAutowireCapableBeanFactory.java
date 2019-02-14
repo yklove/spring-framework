@@ -168,20 +168,31 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	/**
 	 * Create a new AbstractAutowireCapableBeanFactory.
+	 *
+	 * 创建一个新的AbstractAutowireCapableBeanFactory.
 	 */
 	public AbstractAutowireCapableBeanFactory() {
+		//调用父类(AbstractBeanFactory)的构造方法
 		super();
+		//忽略BeanNameAware接口实现类的自动注入
 		ignoreDependencyInterface(BeanNameAware.class);
+		//忽略BeanFactoryAware接口实现类的自动注入
 		ignoreDependencyInterface(BeanFactoryAware.class);
+		//忽略BeanClassLoaderAware接口实现类的自动注入
 		ignoreDependencyInterface(BeanClassLoaderAware.class);
 	}
 
 	/**
 	 * Create a new AbstractAutowireCapableBeanFactory with the given parent.
-	 * @param parentBeanFactory parent bean factory, or {@code null} if none
+	 *
+	 * 根据父级创建一个新的AbstractAutowireCapableBeanFactory.
+	 *
+	 * @param parentBeanFactory parent bean factory, or {@code null} if none.父bean工厂,或者是null.
 	 */
 	public AbstractAutowireCapableBeanFactory(@Nullable BeanFactory parentBeanFactory) {
+		//调用无参的构建方法
 		this();
+		//设置父bean工厂
 		setParentBeanFactory(parentBeanFactory);
 	}
 
@@ -265,6 +276,12 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 	/**
 	 * Ignore the given dependency interface for autowiring.
+	 *
+	 * 忽略接口实现类中存在依赖外部的bean属性注入.
+	 * 参考:https://www.jianshu.com/p/3c7e0608ff1f
+	 * 例如在BeanFactoryAware接口中,beanFactory属性是依赖外部注入的,
+	 * 调用ignoreDependencyInterface方法之后,改依赖将被忽略.
+	 *
 	 * <p>This will typically be used by application contexts to register
 	 * dependencies that are resolved in other ways, like BeanFactory through
 	 * BeanFactoryAware or ApplicationContext through ApplicationContextAware.
@@ -274,6 +291,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * @see org.springframework.context.ApplicationContextAware
 	 */
 	public void ignoreDependencyInterface(Class<?> ifc) {
+		//存放到set中
 		this.ignoredDependencyInterfaces.add(ifc);
 	}
 

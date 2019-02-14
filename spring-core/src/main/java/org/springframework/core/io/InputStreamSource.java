@@ -42,7 +42,13 @@ public interface InputStreamSource {
 
 	/**
 	 * Return an {@link InputStream} for the content of an underlying resource.
+	 *
+	 * 返回一个InputStream，目的是为了获取底层资源的内容
+	 *
 	 * <p>It is expected that each call creates a <i>fresh</i> stream.
+	 *
+	 * 每一次调用都会创建一个新的流
+	 *
 	 * <p>This requirement is particularly important when you consider an API such
 	 * as JavaMail, which needs to be able to read the stream multiple times when
 	 * creating mail attachments. For such a use case, it is <i>required</i>

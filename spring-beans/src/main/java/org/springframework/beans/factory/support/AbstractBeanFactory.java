@@ -176,8 +176,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	/**
 	 * Create a new AbstractBeanFactory.
+	 * 创建一个新的AbstractBeanFactory.
 	 */
 	public AbstractBeanFactory() {
+		//什么都没做
 	}
 
 	/**
@@ -708,6 +710,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 
 	@Override
 	public void setParentBeanFactory(@Nullable BeanFactory parentBeanFactory) {
+		//如果传入的父bean工厂不为null,并且当前对象的父bean工厂与传入的不符,则抛出异常
 		if (this.parentBeanFactory != null && this.parentBeanFactory != parentBeanFactory) {
 			throw new IllegalStateException("Already associated with parent BeanFactory: " + this.parentBeanFactory);
 		}
