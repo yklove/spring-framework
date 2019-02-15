@@ -73,7 +73,9 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 	@Override
 	@Nullable
 	public InputSource resolveEntity(String publicId, @Nullable String systemId) throws SAXException, IOException {
+		//首先委托父类进行解析,父类仅能解析出dtd和xsd文件
 		InputSource source = super.resolveEntity(publicId, systemId);
+		//如果父类没有解析成功,再尝试解析
 		if (source == null && systemId != null) {
 			String resourcePath = null;
 			try {

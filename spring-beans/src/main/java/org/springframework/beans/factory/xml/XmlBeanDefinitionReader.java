@@ -260,15 +260,24 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	/**
 	 * Return the EntityResolver to use, building a default resolver
 	 * if none specified.
+	 * 返回要使用的EntityResolver,如果没有指定,则构建默认解析器.
 	 */
 	protected EntityResolver getEntityResolver() {
+		//解析器是null
 		if (this.entityResolver == null) {
 			// Determine default EntityResolver to use.
+			// XmlBeanDefinitionReader 继承了 AbstractBeanDefinitionReader,
+			// AbstractBeanDefinitionReader中的构造方法中如果传入的BeanDefinitionRegistry对象没有实现ResourceLoader接口,
+			// 则使用PathMatchingResourcePatternResolver
+			// @link AbstractBeanDefinitionReader#AbstractBeanDefinitionReader(BeanDefinitionRegistry)}
 			ResourceLoader resourceLoader = getResourceLoader();
+			//如果resourceLoader不为null
 			if (resourceLoader != null) {
+				//构造一个ResourceEntityResolver
 				this.entityResolver = new ResourceEntityResolver(resourceLoader);
 			}
 			else {
+				//否则获取bean的ClassLoader,构造一个DelegatingEntityResolver
 				this.entityResolver = new DelegatingEntityResolver(getBeanClassLoader());
 			}
 		}
@@ -410,6 +419,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 			throws BeanDefinitionStoreException {
 
 		try {
+			//转换成Document
 			Document doc = doLoadDocument(inputSource, resource);
 			int count = registerBeanDefinitions(doc, resource);
 			if (logger.isDebugEnabled()) {
@@ -452,6 +462,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 	 * @see DocumentLoader#loadDocument
 	 */
 	protected Document doLoadDocument(InputSource inputSource, Resource resource) throws Exception {
+		//使用DocumentLoader加载xml文件
 		return this.documentLoader.loadDocument(inputSource, getEntityResolver(), this.errorHandler,
 				getValidationModeForResource(resource), isNamespaceAware());
 	}
