@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
@@ -936,8 +937,7 @@ public abstract class StringUtils {
 			return array1;
 		}
 
-		List<String> result = new ArrayList<>();
-		result.addAll(Arrays.asList(array1));
+		List<String> result = new ArrayList<>(Arrays.asList(array1));
 		for (String str : array2) {
 			if (!result.contains(str)) {
 				result.add(str);
@@ -1319,14 +1319,11 @@ public abstract class StringUtils {
 			return ObjectUtils.nullSafeToString(arr[0]);
 		}
 
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < arr.length; i++) {
-			if (i > 0) {
-				sb.append(delim);
-			}
-			sb.append(arr[i]);
+		StringJoiner sj = new StringJoiner(delim);
+		for (Object o : arr) {
+			sj.add(String.valueOf(o));
 		}
-		return sb.toString();
+		return sj.toString();
 	}
 
 	/**
