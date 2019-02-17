@@ -79,6 +79,7 @@ public class ResourceEntityResolver extends DelegatingEntityResolver {
 		if (source == null && systemId != null) {
 			String resourcePath = null;
 			try {
+				//对systemId使用URL解码器进行解码
 				String decodedSystemId = URLDecoder.decode(systemId, "UTF-8");
 				String givenUrl = new URL(decodedSystemId).toString();
 				String systemRootUrl = new File("").toURI().toURL().toString();
