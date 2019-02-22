@@ -20,10 +20,10 @@ https://stackoverflow.com/questions/tagged/spring+kotlin[Stackoverflow] if you n
 [[kotlin-requirements]]
 == Requirements
 
-The Spring Framework supports Kotlin 1.1+ and requires
+The Spring Framework supports Kotlin 1.3+ and requires
 https://bintray.com/bintray/jcenter/org.jetbrains.kotlin%3Akotlin-stdlib[`kotlin-stdlib`]
-(or one of its variants, such as https://bintray.com/bintray/jcenter/org.jetbrains.kotlin%3Akotlin-stdlib-jre8[`kotlin-stdlib-jre8`]
-for Kotlin 1.1 or https://bintray.com/bintray/jcenter/org.jetbrains.kotlin%3Akotlin-stdlib-jdk8[`kotlin-stdlib-jdk8`] for Kotlin 1.2+)
+(or one of its variants, such as
+https://bintray.com/bintray/jcenter/org.jetbrains.kotlin%3Akotlin-stdlib-jdk8[`kotlin-stdlib-jdk8`])
 and https://bintray.com/bintray/jcenter/org.jetbrains.kotlin%3Akotlin-reflect[`kotlin-reflect`]
 to be present on the classpath. They are provided by default if you bootstrap a Kotlin project on
 https://start.spring.io/#!language=kotlin[start.spring.io].
@@ -255,17 +255,19 @@ for more details and up-to-date information.
 == Web
 
 
+=== WebFlux router DSL
 
-=== WebFlux Functional DSL
+Spring Framework comes with a Kotlin router DSL available in 2 flavors:
 
-Spring Framework now comes with a
-{doc-root}/spring-framework/docs/{spring-version}/kdoc-api/spring-framework/org.springframework.web.reactive.function.server/-router-function-dsl/[Kotlin routing DSL]
-that lets you use the <<web-reactive#webflux-fn,WebFlux functional API>> to write clean and idiomatic Kotlin code,
-as the following example shows:
+ - Reactive with {doc-root}/spring-framework/docs/{spring-version}/kdoc-api/spring-framework/org.springframework.web.reactive.function.server/-router-function-dsl/[router { }]
+ - <<Coroutines>>
+
+These DSL let you use the <<web-reactive#webflux-fn,WebFlux functional API>> to write clean and idiomatic Kotlin code
+to build a `RouterFunction` instance as the following example shows:
 
 [source,kotlin,indent=0]
 ----
-	router {
+	val routes: RouterFunction<ServerResponse> = router {
 		accept(TEXT_HTML).nest {
 			GET("/") { ok().render("index") }
 			GET("/sse") { ok().render("sse") }
@@ -290,7 +292,39 @@ depending on dynamic data (for example, from a database).
 See https://github.com/mixitconf/mixit/tree/dafd5ccc92dfab6d9c306fcb60b28921a1ccbf79/src/main/kotlin/mixit/web/routes[MiXiT project routes]
 for a concrete example.
 
+=== Coroutines
 
+As of Spring Framework 5.2, https://kotlinlang.org/docs/reference/coroutines-overview.html[Coroutines] support
+is provided via extensions for WebFlux client and server functional API. A dedicated
+{doc-root}/spring-framework/docs/{spring-version}/kdoc-api/spring-framework/org.springframework.web.reactive.function.server/-co-router-function-dsl/[`coRouter { }`]
+router DSL is also available.
+
+Coroutines extensions use `await` prefix or `AndAwait` suffix, and most are using similar names to their Reactive
+counterparts, except `exchange` in `WebClient.RequestHeadersSpec` which translates to `awaitResponse`.
+
+[source,kotlin,indent=0]
+----
+fun routes(userHandler: UserHandler): RouterFunction<ServerResponse> = coRouter {
+	GET("/", userHandler::listView)
+	GET("/api/user", userHandler::listApi)
+}
+
+class UserHandler(builder: WebClient.Builder) {
+
+	private val client = builder.baseUrl("...").build()
+
+	suspend fun listView(request: ServerRequest): ServerResponse =
+			ServerResponse.ok().renderAndAwait("users", mapOf("users" to
+			client.get().uri("...").awaitResponse().awaitBody<User>()))
+
+	suspend fun listApi(request: ServerRequest): ServerResponse =
+				ServerResponse.ok().contentType(MediaType.APPLICATION_JSON_UTF8).bodyAndAwait(
+				client.get().uri("...").awaitResponse().awaitBody<User>())
+}
+----
+
+Read this blog post about https://medium.com/@elizarov/structured-concurrency-722d765aa952[structured concurrency]
+to understand how to run code concurrently with Coroutines.
 
 === Kotlin Script Templates
 
@@ -324,9 +358,12 @@ refactoring support in a supported IDE, as the following example shows:
 	"""
 ----
 
+NOTE: Kotlin Script Templates are not compatible yet with Spring Boot fatjar mechanism, see related
+https://youtrack.jetbrains.com/issue/KT-21443[KT-21443] and https://youtrack.jetbrains.com/issue/KT-27956[KT-27956]
+issues.
+
 See the https://github.com/sdeleuze/kotlin-script-templating[kotlin-script-templating] example
 project for more details.
-
 
 
 [[kotlin-spring-projects-in-kotlin]]
@@ -497,6 +534,16 @@ and https://github.com/spring-projects/spring-boot/issues/1254[`@ConfigurationPr
 for more details.
 
 
+=== Checked Exceptions
+
+Java and https://kotlinlang.org/docs/reference/exceptions.html[Kotlin exception handling] are pretty close, with the main
+difference being that Kotlin treats all exceptions as unchecked exceptions. However, when using proxied objects
+(for example classes or methods annotated with `@Transactional`), checked exceptions thrown will be wrapped by default in
+an `UndeclaredThrowableException`.
+
+To get the original exception thrown like in Java, methods should be annotated with https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.jvm/-throws/index.html[`@Throws`]
+to specify explicitly the checked exceptions thrown (for example `@Throws(IOException::class)`).
+
 
 === Annotation Array Attributes
 
@@ -554,7 +601,7 @@ is https://junit.org/junit5/[JUnit 5], as well as https://mockk.io/[Mockk] for m
 ==== Constructor injection
 
 As described in the <<testing#testcontext-junit-jupiter-di#spring-web-reactive,dedicated section>>, JUnit 5 allows
-constructor injection of beans which is pretty useful with Kotlin in order to use `val` instead of `lateinit var `.
+constructor injection of beans which is pretty useful with Kotlin in order to use `val` instead of `lateinit var`.
 
 
 ====
@@ -576,8 +623,8 @@ You can also use `@Autowired` at constructor level to autowire all parameters.
 ----
 @SpringJUnitConfig(TestConfig::class)
 class OrderServiceIntegrationTests @Autowired constructor(
-		val orderService: OrderService,
-		val customerService: CustomerService) {
+        val orderService: OrderService,
+        val customerService: CustomerService) {
 
     // tests that use the injected OrderService and CustomerService
 }
@@ -587,16 +634,16 @@ class OrderServiceIntegrationTests @Autowired constructor(
 
 ==== `PER_CLASS` Lifecycle
 
-Kotlin lets you specify meaningful test function names between backticks (\`).
+Kotlin lets you specify meaningful test function names between backticks (```).
 As of JUnit 5, Kotlin test classes can use the `@TestInstance(TestInstance.Lifecycle.PER_CLASS)`
 annotation to enable a single instantiation of test classes, which allows the use of `@BeforeAll` and `@AfterAll`
 annotations on non-static methods, which is a good fit for Kotlin.
 
-You can now change the default behavior to `PER_CLASS` thanks to a
+You can also change the default behavior to `PER_CLASS` thanks to a
 `junit-platform.properties` file with a
 `junit.jupiter.testinstance.lifecycle.default = per_class` property.
 
-The following example `@BeforeAll` and `@AfterAll` annotations on non-static methods:
+The following example demonstrates `@BeforeAll` and `@AfterAll` annotations on non-static methods:
 
 [source]
 ----
