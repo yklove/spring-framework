@@ -71,7 +71,12 @@ public class PluggableSchemaResolver implements EntityResolver {
 
 	private final String schemaMappingsLocation;
 
-	/** Stores the mapping of schema URL -> local schema path. */
+	/**
+	 * Stores the mapping of schema URL -> local schema path.
+	 *
+	 * 存储schema URL 到 schema 路径的映射关系
+	 *
+	 */
 	@Nullable
 	private volatile Map<String, String> schemaMappings;
 
@@ -112,8 +117,11 @@ public class PluggableSchemaResolver implements EntityResolver {
 		}
 
 		if (systemId != null) {
+			// 获取本地的schemas文件位置
 			String resourceLocation = getSchemaMappings().get(systemId);
+			// 如果存在这样的一个文件位置
 			if (resourceLocation != null) {
+				// 加载文件
 				Resource resource = new ClassPathResource(resourceLocation, this.classLoader);
 				try {
 					InputSource source = new InputSource(resource.getInputStream());
@@ -131,28 +139,36 @@ public class PluggableSchemaResolver implements EntityResolver {
 				}
 			}
 		}
+		//如果上述失败,使用默认的行为
 		return null;
 	}
 
 	/**
 	 * Load the specified schema mappings lazily.
+	 *
+	 * 懒惰加载schema映射关系
 	 */
 	private Map<String, String> getSchemaMappings() {
 		Map<String, String> schemaMappings = this.schemaMappings;
+		//最初是null
 		if (schemaMappings == null) {
+			//加锁,双重检查
 			synchronized (this) {
 				schemaMappings = this.schemaMappings;
+				//第二次检查还是null
 				if (schemaMappings == null) {
 					if (logger.isTraceEnabled()) {
 						logger.trace("Loading schema mappings from [" + this.schemaMappingsLocation + "]");
 					}
 					try {
+						//尝试从META-INF/spring.schemas文件中加载schema映射关系
 						Properties mappings =
 								PropertiesLoaderUtils.loadAllProperties(this.schemaMappingsLocation, this.classLoader);
 						if (logger.isTraceEnabled()) {
 							logger.trace("Loaded schema mappings: " + mappings);
 						}
 						schemaMappings = new ConcurrentHashMap<>(mappings.size());
+						//结果合并
 						CollectionUtils.mergePropertiesIntoMap(mappings, schemaMappings);
 						this.schemaMappings = schemaMappings;
 					}

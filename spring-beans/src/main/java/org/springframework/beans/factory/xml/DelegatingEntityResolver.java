@@ -81,9 +81,12 @@ public class DelegatingEntityResolver implements EntityResolver {
 	@Nullable
 	public InputSource resolveEntity(String publicId, @Nullable String systemId) throws SAXException, IOException {
 		if (systemId != null) {
+			//如果是dtd
 			if (systemId.endsWith(DTD_SUFFIX)) {
+				//尝试从本地加载dtd文件,如果加载不到,则从网络中加载
 				return this.dtdResolver.resolveEntity(publicId, systemId);
 			}
+			//xsd
 			else if (systemId.endsWith(XSD_SUFFIX)) {
 				return this.schemaResolver.resolveEntity(publicId, systemId);
 			}

@@ -452,13 +452,17 @@ public class BeanDefinitionParserDelegate {
 		}
 
 		if (containingBean == null) {
+			// 检查名称的唯一性
 			checkNameUniqueness(beanName, aliases, ele);
 		}
 
+		// 解析其它属性并封装到GenericBeanDefinition中(通用的bean定义类)
 		AbstractBeanDefinition beanDefinition = parseBeanDefinitionElement(ele, beanName, containingBean);
 		if (beanDefinition != null) {
+			// 如果beanName没有定义,尝试生成bean名称
 			if (!StringUtils.hasText(beanName)) {
 				try {
+					// 如果containingBean不为null,从中获取beanName
 					if (containingBean != null) {
 						beanName = BeanDefinitionReaderUtils.generateBeanName(
 								beanDefinition, this.readerContext.getRegistry(), true);
@@ -486,6 +490,7 @@ public class BeanDefinitionParserDelegate {
 				}
 			}
 			String[] aliasesArray = StringUtils.toStringArray(aliases);
+			// 将获取到的信息封装到BeanDefinitionHolder中
 			return new BeanDefinitionHolder(beanDefinition, beanName, aliasesArray);
 		}
 
@@ -508,7 +513,7 @@ public class BeanDefinitionParserDelegate {
 			//寻找别名集合中在usedNames集合中第一个相同的对象
 			foundName = CollectionUtils.findFirstMatch(this.usedNames, aliases);
 		}
-		//如果寻找到了，则认为已经在别的bean元素中使用过了，???这个error？？
+		//如果寻找到了，则认为已经在别的bean元素中使用过了,抛出error
 		if (foundName != null) {
 			error("Bean name '" + foundName + "' is already used in this <beans> element", beanElement);
 		}
@@ -528,26 +533,38 @@ public class BeanDefinitionParserDelegate {
 		this.parseState.push(new BeanEntry(beanName));
 
 		String className = null;
+		// 解析class属性
 		if (ele.hasAttribute(CLASS_ATTRIBUTE)) {
 			className = ele.getAttribute(CLASS_ATTRIBUTE).trim();
 		}
 		String parent = null;
+		// 解析parent属性
 		if (ele.hasAttribute(PARENT_ATTRIBUTE)) {
 			parent = ele.getAttribute(PARENT_ATTRIBUTE);
 		}
 
 		try {
+
+			// 创建GenericBeanDefinition实例,用于存放各种信息
 			AbstractBeanDefinition bd = createBeanDefinition(className, parent);
 
+			// 硬编码解析默认bean的各种属性
 			parseBeanDefinitionAttributes(ele, beanName, containingBean, bd);
+			// 提取Description
 			bd.setDescription(DomUtils.getChildElementValueByTagName(ele, DESCRIPTION_ELEMENT));
 
+			// 解析元数据
 			parseMetaElements(ele, bd);
+			// 解析lookup-method属性
 			parseLookupOverrideSubElements(ele, bd.getMethodOverrides());
+			// 解析replace-method属性
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
+			// 解析构造函数参数
 			parseConstructorArgElements(ele, bd);
+			// 解析property子元素
 			parsePropertyElements(ele, bd);
+			// 解析qualifier子元素
 			parseQualifierElements(ele, bd);
 
 			bd.setResource(this.readerContext.getResource());
@@ -580,7 +597,7 @@ public class BeanDefinitionParserDelegate {
 	 */
 	public AbstractBeanDefinition parseBeanDefinitionAttributes(Element ele, String beanName,
 			@Nullable BeanDefinition containingBean, AbstractBeanDefinition bd) {
-
+		// 如果存在singleton属性,抛出error,这个属性在加载dom文档的时候便会抛出错误
 		if (ele.hasAttribute(SINGLETON_ATTRIBUTE)) {
 			error("Old 1.x 'singleton' attribute in use - upgrade to 'scope' declaration", ele);
 		}
@@ -595,8 +612,9 @@ public class BeanDefinitionParserDelegate {
 		if (ele.hasAttribute(ABSTRACT_ATTRIBUTE)) {
 			bd.setAbstract(TRUE_VALUE.equals(ele.getAttribute(ABSTRACT_ATTRIBUTE)));
 		}
-
+		// 获取懒加载属性
 		String lazyInit = ele.getAttribute(LAZY_INIT_ATTRIBUTE);
+		// 如果是default或者是""
 		if (isDefaultValue(lazyInit)) {
 			lazyInit = this.defaults.getLazyInit();
 		}
@@ -664,6 +682,7 @@ public class BeanDefinitionParserDelegate {
 	protected AbstractBeanDefinition createBeanDefinition(@Nullable String className, @Nullable String parentName)
 			throws ClassNotFoundException {
 
+		// BeanDefinitionReaderUtils类创建GenericBeanDefinition
 		return BeanDefinitionReaderUtils.createBeanDefinition(
 				parentName, className, this.readerContext.getBeanClassLoader());
 	}
@@ -1465,6 +1484,7 @@ public class BeanDefinitionParserDelegate {
 	/**
 	 * Get the namespace URI for the supplied node.
 	 * 获取提供的节点的名称空间URI.
+	 * 例如:http://www.springframework.org/schema/beans
 	 * <p>The default implementation uses {@link Node#getNamespaceURI}.
 	 * Subclasses may override the default implementation to provide a
 	 * different namespace identification mechanism.
@@ -1513,7 +1533,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * 检查传入的node是否是默认的命名空间
+	 * 检查传入的node是否是默认的命名空间(http://www.springframework.org/schema/beans)
 	 * @param namespaceUri namespaceUri可以为空
 	 * @return 是否是默认的命名空间
 	 */

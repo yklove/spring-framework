@@ -57,10 +57,16 @@ public class BeansDtdResolver implements EntityResolver {
 			logger.trace("Trying to resolve XML entity with public ID [" + publicId +
 					"] and system ID [" + systemId + "]");
 		}
+		// systemId不为空,并且以.dtd结尾,例如systemId = "http://www.springframework.org/dtd/spring-beans-2.0.dtd"
 		if (systemId != null && systemId.endsWith(DTD_EXTENSION)) {
+			// 寻找最后一个/
 			int lastPathSeparator = systemId.lastIndexOf('/');
+			// 从最后一个/开始,寻找spring-beans字符串位置
 			int dtdNameStart = systemId.indexOf(DTD_NAME, lastPathSeparator);
+			// 存在上述字符串
 			if (dtdNameStart != -1) {
+				// dtd的文件名是spring-beans.dtd.
+				// 这个文件位于:spring-framework/spring-beans/src/main/resources/org/springframework/beans/factory/xml/spring-beans.dtd
 				String dtdFile = DTD_NAME + DTD_EXTENSION;
 				if (logger.isTraceEnabled()) {
 					logger.trace("Trying to locate [" + dtdFile + "] in Spring jar on classpath");
@@ -84,6 +90,7 @@ public class BeansDtdResolver implements EntityResolver {
 		}
 
 		// Use the default behavior -> download from website or wherever.
+		// 返回null,使用默认的行为,从网络上加载
 		return null;
 	}
 
