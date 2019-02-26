@@ -163,7 +163,11 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	@Nullable
 	private SecurityContextProvider securityContextProvider;
 
-	/** Map from bean name to merged RootBeanDefinition. */
+	/**
+	 * Map from bean name to merged RootBeanDefinition.
+	 * 存储Bean名称->合并过的根Bean定义映射关系
+	 * TODO 这个属性不是很理解
+	 */
 	private final Map<String, RootBeanDefinition> mergedBeanDefinitions = new ConcurrentHashMap<>(256);
 
 	/**
@@ -1345,6 +1349,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Remove the merged bean definition for the specified bean,
 	 * recreating it on next access.
+	 * 从mergedBeanDefinitions中删除指定的beanName对应的信息，在下次访问时重新创建它
 	 * @param beanName the bean name to clear the merged definition for
 	 */
 	protected void clearMergedBeanDefinition(String beanName) {

@@ -70,6 +70,7 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	@Override
 	@Nullable
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
+		// 寻找解析器并进行解析操作
 		BeanDefinitionParser parser = findParserForElement(element, parserContext);
 		return (parser != null ? parser.parse(element, parserContext) : null);
 	}
@@ -77,10 +78,13 @@ public abstract class NamespaceHandlerSupport implements NamespaceHandler {
 	/**
 	 * Locates the {@link BeanDefinitionParser} from the register implementations using
 	 * the local name of the supplied {@link Element}.
+	 * 使用提供的{@link Element}的本地名称从寄存器实现中找到{@link BeanDefinitionParser}
 	 */
 	@Nullable
 	private BeanDefinitionParser findParserForElement(Element element, ParserContext parserContext) {
+		// 获取结点的localName
 		String localName = parserContext.getDelegate().getLocalName(element);
+		// 根据localName获取解析器
 		BeanDefinitionParser parser = this.parsers.get(localName);
 		if (parser == null) {
 			parserContext.getReaderContext().fatal(

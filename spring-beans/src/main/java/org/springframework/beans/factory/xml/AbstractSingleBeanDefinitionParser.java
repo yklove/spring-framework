@@ -60,16 +60,21 @@ public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDef
 	 */
 	@Override
 	protected final AbstractBeanDefinition parseInternal(Element element, ParserContext parserContext) {
+		// 创建BeanDefinitionBuilder实例
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition();
+		// 设置parentName
 		String parentName = getParentName(element);
 		if (parentName != null) {
 			builder.getRawBeanDefinition().setParentName(parentName);
 		}
+		// 会调用自定义BeanDefinitionParser中的getBeanClass方法
+		// 设置beanClass
 		Class<?> beanClass = getBeanClass(element);
 		if (beanClass != null) {
 			builder.getRawBeanDefinition().setBeanClass(beanClass);
 		}
 		else {
+			// 如果子类没有重写getBeanClass方法,尝试检查有没有重写getBeanClassName方法
 			String beanClassName = getBeanClassName(element);
 			if (beanClassName != null) {
 				builder.getRawBeanDefinition().setBeanClassName(beanClassName);
@@ -79,13 +84,17 @@ public abstract class AbstractSingleBeanDefinitionParser extends AbstractBeanDef
 		BeanDefinition containingBd = parserContext.getContainingBeanDefinition();
 		if (containingBd != null) {
 			// Inner bean definition must receive same scope as containing bean.
+			// 如果存在父类,则使用父类的scope属性
 			builder.setScope(containingBd.getScope());
 		}
 		if (parserContext.isDefaultLazyInit()) {
 			// Default-lazy-init applies to custom bean definitions as well.
+			// 设置懒加载
 			builder.setLazyInit(true);
 		}
+		// 调用子类的方法进行解析
 		doParse(element, parserContext, builder);
+		// 返回bean定义
 		return builder.getBeanDefinition();
 	}
 

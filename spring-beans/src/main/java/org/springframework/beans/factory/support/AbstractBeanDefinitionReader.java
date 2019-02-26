@@ -212,6 +212,12 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 	}
 
 
+	/**
+	 * 加载bean定义
+	 * @param resources the resource descriptors
+	 * @return
+	 * @throws BeanDefinitionStoreException
+	 */
 	@Override
 	public int loadBeanDefinitions(Resource... resources) throws BeanDefinitionStoreException {
 		Assert.notNull(resources, "Resource array must not be null");
@@ -251,8 +257,11 @@ public abstract class AbstractBeanDefinitionReader implements BeanDefinitionRead
 
 		if (resourceLoader instanceof ResourcePatternResolver) {
 			// Resource pattern matching available.
+			// 资源模式匹配可用
 			try {
+				// 根据路径加载资源
 				Resource[] resources = ((ResourcePatternResolver) resourceLoader).getResources(location);
+				// 加载bean定义
 				int count = loadBeanDefinitions(resources);
 				if (actualResources != null) {
 					Collections.addAll(actualResources, resources);

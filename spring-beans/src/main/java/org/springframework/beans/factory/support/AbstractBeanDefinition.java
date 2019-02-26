@@ -470,9 +470,12 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Return the class of the wrapped bean, if already resolved.
-	 * @return the bean class, or {@code null} if none defined
+	 * 如果已经解析，则返回包装bean的类..
+	 * @return the bean class, or {@code null} if none defined.
+	 * bean类,如果没有定义,则为{@code null}.
 	 * @throws IllegalStateException if the bean definition does not define a bean class,
-	 * or a specified bean class name has not been resolved into an actual Class
+	 * or a specified bean class name has not been resolved into an actual Class.
+	 * 如果bean定义中没有定义bean类,或指定的bean类名尚未解析为实际的Class.
 	 */
 	public Class<?> getBeanClass() throws IllegalStateException {
 		Object beanClassObject = this.beanClass;
@@ -488,6 +491,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Return whether this definition specifies a bean class.
+	 * 这个bean定义是否指定了bean的类型。
 	 */
 	public boolean hasBeanClass() {
 		return (this.beanClass instanceof Class);
@@ -860,6 +864,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Return a factory method, if any.
+	 * 如果有的话，返回工厂方法。
 	 */
 	@Override
 	@Nullable
@@ -941,6 +946,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Return if there are method overrides defined for this bean.
+	 * 如果为此bean定义了方法覆盖，则返回true.
 	 * @since 5.0.2
 	 */
 	public boolean hasMethodOverrides() {
@@ -1123,9 +1129,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Validate this bean definition.
+	 * 验证此bean的定义
 	 * @throws BeanDefinitionValidationException in case of validation failure
 	 */
 	public void validate() throws BeanDefinitionValidationException {
+		// 如果存在方法覆盖,并存在工厂方法抛出异常
 		if (hasMethodOverrides() && getFactoryMethodName() != null) {
 			throw new BeanDefinitionValidationException(
 					"Cannot combine static factory method with method overrides: " +
@@ -1140,14 +1148,19 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Validate and prepare the method overrides defined for this bean.
 	 * Checks for existence of a method with the specified name.
+	 * 验证并准备为此bean定义的方法覆盖。
+	 * 检查是否存在具有指定名称的方法。
 	 * @throws BeanDefinitionValidationException in case of validation failure
 	 */
 	public void prepareMethodOverrides() throws BeanDefinitionValidationException {
 		// Check that lookup methods exists.
+		// 检查查找方法是否存在。
 		if (hasMethodOverrides()) {
+			// 待覆盖的方法
 			Set<MethodOverride> overrides = getMethodOverrides().getOverrides();
 			synchronized (overrides) {
 				for (MethodOverride mo : overrides) {
+					// 检查是否存在重载方法,如果没有,标记MethodOverride.setOverloaded(false)
 					prepareMethodOverride(mo);
 				}
 			}
@@ -1156,8 +1169,11 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Validate and prepare the given method override.
+	 * 验证并准备给定的方法覆盖。
 	 * Checks for existence of a method with the specified name,
 	 * marking it as not overloaded if none found.
+	 * 检查是否存在具有指定名称的方法,如果没有找到则将其标记为未过载.
+	 * 检查是否存在重载方法,如果没有,标记MethodOverride.setOverloaded(false)
 	 * @param mo the MethodOverride object to validate
 	 * @throws BeanDefinitionValidationException in case of validation failure
 	 */
@@ -1170,6 +1186,7 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 		}
 		else if (count == 1) {
 			// Mark override as not overloaded, to avoid the overhead of arg type checking.
+			// 将覆盖标记为未重载，以避免arg类型检查的开销。(没有重载方法,不需要根据参数来确定是哪个方法)
 			mo.setOverloaded(false);
 		}
 	}

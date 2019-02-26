@@ -612,12 +612,18 @@ public abstract class StringUtils {
 	 * @return the full file path that results from applying the relative path
 	 */
 	public static String applyRelativePath(String path, String relativePath) {
+		// 寻找最后一个/位置
 		int separatorIndex = path.lastIndexOf(FOLDER_SEPARATOR);
+		// 如果存在/
 		if (separatorIndex != -1) {
+			// 从头到/进行截取
 			String newPath = path.substring(0, separatorIndex);
+			// 如果相对路径不包含前缀不包含/
 			if (!relativePath.startsWith(FOLDER_SEPARATOR)) {
+				// 拼接上/
 				newPath += FOLDER_SEPARATOR;
 			}
+			// 拼接到一起
 			return newPath + relativePath;
 		}
 		else {

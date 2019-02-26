@@ -900,11 +900,9 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		if (beanDefinition instanceof AbstractBeanDefinition) {
 			try {
-				/**
-				 * 注册前的最后一次校验
-				 * 主要是对AbstractBeanDefinition属性中的methodOverrides校验,
-				 * 校验methodOverrides是否与工厂方法并存或者methodOverrides对应的方法根本不存在
-				 */
+				 // 注册前的最后一次校验
+				 // 主要是对AbstractBeanDefinition属性中的methodOverrides校验,
+				 // 校验methodOverrides是否与工厂方法并存或者methodOverrides对应的方法根本不存在
 				((AbstractBeanDefinition) beanDefinition).validate();
 			}
 			catch (BeanDefinitionValidationException ex) {
@@ -969,7 +967,6 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 						updatedSingletons.remove(beanName);
 						this.manualSingletonNames = updatedSingletons;
 					}
-					// TODO 为什么要复制一份在新的集合中操作?
 				}
 			}
 			else {
@@ -1036,11 +1033,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	 */
 	protected void resetBeanDefinition(String beanName) {
 		// Remove the merged bean definition for the given bean, if already created.
+		// 从mergedBeanDefinitions中删除beanName对应的信息
 		clearMergedBeanDefinition(beanName);
 
 		// Remove corresponding bean from singleton cache, if any. Shouldn't usually
 		// be necessary, rather just meant for overriding a context's default beans
 		// (e.g. the default StaticMessageSource in a StaticApplicationContext).
+		// 从单例缓存中删除相应的bean,如果有的话。通常不应该是必要的,而只是意味着覆盖上下文的默认bean
+		// (例如,StaticApplicationContext中的默认StaticMessageSource).
+		// TODO 不是很理解
+		// 销毁单例
 		destroySingleton(beanName);
 
 		// Notify all post-processors that the specified bean definition has been reset.

@@ -163,6 +163,7 @@ public abstract class PropertiesLoaderUtils {
 	 * (in ISO-8859-1 encoding), using the given class loader.
 	 * <p>Merges properties if more than one resource of the same name
 	 * found in the class path.
+	 * TODO 这个方法可以了解一下
 	 * @param resourceName the name of the class path resource
 	 * @param classLoader the ClassLoader to use for loading
 	 * (or {@code null} to use the default class loader)

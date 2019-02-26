@@ -4,7 +4,7 @@ package cn.yklove.bean;
  * @author qinggeng on 18-12-31.
  */
 
-public class Person {
+public class Person extends PersonSuper{
 
 	private String name;
 
@@ -28,5 +28,10 @@ public class Person {
 
 	public Person() {
 		System.out.println("bean初始化");
+	}
+
+	@Override
+	public void testMethod() {
+		super.testMethod();
 	}
 }
