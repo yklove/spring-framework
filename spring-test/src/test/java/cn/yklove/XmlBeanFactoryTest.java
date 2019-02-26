@@ -14,7 +14,7 @@ public class XmlBeanFactoryTest {
 	@Test
 	public void testXmlBeanFactory(){
 		BeanFactory beanFactory = new XmlBeanFactory(new ClassPathResource("beans.xml"));
-		Person person = (Person) beanFactory.getBean("person");
+		Person person = (Person) beanFactory.getBean("&person");
 		System.out.println(person);
 	}
 

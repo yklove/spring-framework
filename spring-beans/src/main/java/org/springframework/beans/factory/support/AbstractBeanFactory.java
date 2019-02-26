@@ -248,6 +248,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	protected <T> T doGetBean(final String name, @Nullable final Class<T> requiredType,
 			@Nullable final Object[] args, boolean typeCheckOnly) throws BeansException {
 
+		// 转换beanName,去除前缀所有的&,如果是别名,转换成真实名称
 		final String beanName = transformedBeanName(name);
 		Object bean;
 
@@ -1140,6 +1141,7 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * @return the transformed bean name
 	 */
 	protected String transformedBeanName(String name) {
+		// 根据传入的名称取出真实的beanName
 		return canonicalName(BeanFactoryUtils.transformedBeanName(name));
 	}
 
