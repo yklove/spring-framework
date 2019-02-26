@@ -88,6 +88,7 @@ public abstract class DomUtils {
 
 	/**
 	 * Utility method that returns the first child element identified by its name.
+	 * 返回由其名称标识的第一个子元素.
 	 * @param ele the DOM element to analyze
 	 * @param childEleName the child element name to look for
 	 * @return the {@code org.w3c.dom.Element} instance, or {@code null} if none found
@@ -108,6 +109,7 @@ public abstract class DomUtils {
 
 	/**
 	 * Utility method that returns the first child element value identified by its name.
+	 * 按标记名称获取子元素值
 	 * @param ele the DOM element to analyze
 	 * @param childEleName the child element name to look for
 	 * @return the extracted text value, or {@code null} if no child element found
@@ -141,6 +143,7 @@ public abstract class DomUtils {
 	 * <p>Appends all CharacterData nodes and EntityReference nodes into a single
 	 * String value, excluding Comment nodes. Only exposes actual user-specified
 	 * text, no default values of any kind.
+	 * 获取元素的内容
 	 * @see CharacterData
 	 * @see EntityReference
 	 * @see Comment

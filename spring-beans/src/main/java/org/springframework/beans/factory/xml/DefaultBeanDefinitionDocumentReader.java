@@ -330,9 +330,9 @@ public class DefaultBeanDefinitionDocumentReader implements BeanDefinitionDocume
 	protected void processBeanDefinition(Element ele, BeanDefinitionParserDelegate delegate) {
 		// 进行元素解析,返回BeanDefinitionHolder实例
 		BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
-		//如果bdHolder实例不为null
+		// 如果bdHolder实例不为null
 		if (bdHolder != null) {
-			//尝试解析自定义属性
+			// 解析自定义属性
 			bdHolder = delegate.decorateBeanDefinitionIfRequired(ele, bdHolder);
 			try {
 				// Register the final decorated instance.
