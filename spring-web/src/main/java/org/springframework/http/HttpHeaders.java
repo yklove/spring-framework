@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -1505,17 +1506,13 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 * @return a combined result with comma delimitation
 	 */
 	protected String toCommaDelimitedString(List<String> headerValues) {
-		StringBuilder builder = new StringBuilder();
-		for (Iterator<String> it = headerValues.iterator(); it.hasNext();) {
-			String val = it.next();
+		StringJoiner joiner = new StringJoiner(", ");
+		for (String val : headerValues) {
 			if (val != null) {
-				builder.append(val);
-				if (it.hasNext()) {
-					builder.append(", ");
-				}
+				joiner.add(val);
 			}
 		}
-		return builder.toString();
+		return joiner.toString();
 	}
 
 	/**
@@ -1681,7 +1678,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 
 
 	/**
-	 * Return a {@code HttpHeaders} object that can only be read, not written to.
+	 * Return an {@code HttpHeaders} object that can only be read, not written to.
 	 */
 	public static HttpHeaders readOnlyHttpHeaders(HttpHeaders headers) {
 		Assert.notNull(headers, "HttpHeaders must not be null");
@@ -1694,7 +1691,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	}
 
 	/**
-	 * Return a {@code HttpHeaders} object that can be read and written to.
+	 * Return an {@code HttpHeaders} object that can be read and written to.
 	 * @since 5.1.1
 	 */
 	public static HttpHeaders writableHttpHeaders(HttpHeaders headers) {

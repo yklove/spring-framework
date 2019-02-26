@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2018 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 
 import org.springframework.lang.Nullable;
 
 /**
- * Miscellaneous class utility methods.
+ * Miscellaneous {@code java.lang.Class} utility methods.
  * Mainly for internal use within the framework.
  *
  * @author Juergen Hoeller
@@ -656,16 +657,11 @@ public abstract class ClassUtils {
 		if (CollectionUtils.isEmpty(classes)) {
 			return "[]";
 		}
-		StringBuilder sb = new StringBuilder("[");
-		for (Iterator<Class<?>> it = classes.iterator(); it.hasNext(); ) {
-			Class<?> clazz = it.next();
-			sb.append(clazz.getName());
-			if (it.hasNext()) {
-				sb.append(", ");
-			}
+		StringJoiner sj = new StringJoiner(", ", "[", "]");
+		for (Class<?> clazz : classes) {
+			sj.add(clazz.getName());
 		}
-		sb.append("]");
-		return sb.toString();
+		return sj.toString();
 	}
 
 	/**
