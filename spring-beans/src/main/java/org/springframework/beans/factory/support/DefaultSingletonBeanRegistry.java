@@ -91,19 +91,22 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 
 	/**
 	 * Cache of singleton factories: bean name to ObjectFactory.
-	 * 单例工厂的缓存：bean名称 - > ObjectFactory
+	 * 单例工厂的缓存：bean名称 - > ObjectFactory(创建bean的工厂)
 	 */
 	private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>(16);
 
 	/**
 	 * Cache of early singleton objects: bean name to bean instance.
 	 * 早期单例对象的缓存：bean名称 - > bean实例
+	 * 保存beanName和创建bean实例之间的关系,与singletonFactories不用的地方是,当一个单例bean被放到这里之后,
+	 * 那么当bean还在创建过程中,就可以通过getBean方法获取到了,其目的是用来检测循环引用的
 	 */
 	private final Map<String, Object> earlySingletonObjects = new HashMap<>(16);
 
 	/**
 	 * Set of registered singletons, containing the bean names in registration order.
-	 * 一组注册的单例，包含注册顺序中的bean名称
+	 * 一组注册的单例，包含注册顺序中的bean名称.
+	 * 用来保存当前所有已经注册的bean.
 	 */
 	private final Set<String> registeredSingletons = new LinkedHashSet<>(256);
 
@@ -267,6 +270,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 						this.earlySingletonObjects.put(beanName, singletonObject);
 						// 从singletonFactories中删除该beanName对应的工厂
 						this.singletonFactories.remove(beanName);
+						// earlySingletonObjects与singletonFactories互斥
 					}
 				}
 			}
