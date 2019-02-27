@@ -340,9 +340,11 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					if (recordSuppressedExceptions) {
 						this.suppressedExceptions = null;
 					}
+					// bean加载结束后,需要移除缓存中对该bean的正在加载状态的记录
 					afterSingletonCreation(beanName);
 				}
 				if (newSingleton) {
+					// 加入到缓存中,并删除各种辅助状态
 					addSingleton(beanName, singletonObject);
 				}
 			}
@@ -439,6 +441,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * @see #isSingletonCurrentlyInCreation
 	 */
 	protected void beforeSingletonCreation(String beanName) {
+		// 将beanName加入到正在创建的beanMap中,便于后续循环依赖检测
 		if (!this.inCreationCheckExclusions.contains(beanName) && !this.singletonsCurrentlyInCreation.add(beanName)) {
 			throw new BeanCurrentlyInCreationException(beanName);
 		}

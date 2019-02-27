@@ -120,6 +120,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 								// Temporarily return non-post-processed object, not storing it yet..
 								return object;
 							}
+							// 创建bean之前
 							beforeSingletonCreation(beanName);
 							try {
 								// 调用ObjectFactory的后置处理器
@@ -130,6 +131,7 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 										"Post-processing of FactoryBean's singleton object failed", ex);
 							}
 							finally {
+								// 创建bean之后
 								afterSingletonCreation(beanName);
 							}
 						}
@@ -210,6 +212,10 @@ public abstract class FactoryBeanRegistrySupport extends DefaultSingletonBeanReg
 	 * The resulting object will get exposed for bean references.
 	 * <p>The default implementation simply returns the given object as-is.
 	 * Subclasses may override this, for example, to apply post-processors.
+	 *
+	 * 对从FactoryBean获取的给定对象进行后处理.生成的对象将暴露给bean引用.
+	 * <p>默认实现只是按原样返回给定的对象.子类可以覆盖它,例如,应用后处理器.
+	 *
 	 * @param object the object obtained from the FactoryBean.
 	 * @param beanName the name of the bean
 	 * @return the object to expose
