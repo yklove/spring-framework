@@ -42,7 +42,8 @@ public interface ObjectFactory<T> {
 	/**
 	 * Return an instance (possibly shared or independent)
 	 * of the object managed by this factory.
-	 * @return the resulting instance
+	 * 返回此工厂管理的对象的实例(可能是共享的或独立的).
+	 * @return the resulting instance.由此产生的实例
 	 * @throws BeansException in case of creation errors
 	 */
 	T getObject() throws BeansException;

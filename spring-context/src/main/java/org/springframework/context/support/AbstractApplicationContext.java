@@ -181,7 +181,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/** System time in milliseconds when this context started. */
 	private long startupDate;
 
-	/** Flag that indicates whether this context is currently active. */
+	/**
+	 * Flag that indicates whether this context is currently active.
+	 * 指示此上下文当前是否处于活动状态的标志.
+	 */
 	private final AtomicBoolean active = new AtomicBoolean();
 
 	/** Flag that indicates whether this context has been closed already. */
@@ -1082,6 +1085,10 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>The default implementation checks the {@link #isActive() 'active'} status
 	 * of this context overall. May be overridden for more specific checks, or for a
 	 * no-op if {@link #getBeanFactory()} itself throws an exception in such a case.
+	 * 断言此上下文的BeanFactory当前处于活动状态,如果不是,则抛出{@link IllegalStateException}.
+	 * 由依赖于活动上下文的所有{@link BeanFactory}委派方法调用,即特别是所有bean访问器方法.
+	 * 默认实现整体检查此上下文的{@link #isActive() 'active'}状态.
+	 * 如果{@link #getBeanFactory()}本身在这种情况下抛出异常,则可以覆盖更具体的检查,或者覆盖no-op.
 	 */
 	protected void assertBeanFactoryActive() {
 		if (!this.active.get()) {
@@ -1101,6 +1108,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 
 	@Override
 	public Object getBean(String name) throws BeansException {
+		// 检查beanFactory是否是活跃的
 		assertBeanFactoryActive();
 		return getBeanFactory().getBean(name);
 	}
@@ -1389,10 +1397,18 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 * <p>Note: Subclasses should check whether the context is still active before
 	 * returning the internal bean factory. The internal factory should generally be
 	 * considered unavailable once the context has been closed.
-	 * @return this application context's internal bean factory (never {@code null})
+	 *
+	 * <p>子类必须在此处返回其内部bean工厂.
+	 * 他们应该有效地实现查找,以便可以重复调用它而不会降低性能.
+	 * <p>注意:子类应在返回内部bean工厂之前检查上下文是否仍处于活动状态.
+	 * 一旦关闭上下文,通常应将内部工厂视为不可用.
+	 *
+	 * @return this application context's internal bean factory (never {@code null}).
+	 * 这个应用程序上下文的内部bean工厂(不为 {@code null}).
 	 * @throws IllegalStateException if the context does not hold an internal bean factory yet
 	 * (usually if {@link #refresh()} has never been called) or if the context has been
-	 * closed already
+	 * closed already.
+	 * 如果上下文没有内部bean工厂(通常是{@link #refresh()}从未被调用过)或者上下文已经关闭.
 	 * @see #refreshBeanFactory()
 	 * @see #closeBeanFactory()
 	 */
