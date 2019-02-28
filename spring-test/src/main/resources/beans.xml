@@ -7,4 +7,13 @@
 		<property name="name" value="aaa"/>
 		<property name="age" value="1"/>
 	</bean>
+	<bean id="a" class="cn.yklove.bean.A">
+		<property name="b" ref="b"/>
+	</bean>
+	<bean id="b" class="cn.yklove.bean.B">
+		<property name="c" ref="c"/>
+	</bean>
+	<bean id="c" class="cn.yklove.bean.C">
+		<property name="a" ref="a"/>
+	</bean>
 </beans>
