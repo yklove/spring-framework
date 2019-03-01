@@ -22,7 +22,7 @@ public class XmlBeanFactoryTest {
 		System.out.println(a);
 		long start = System.currentTimeMillis();
 
-		a.test(1);
+//		a.test(1);
 
 		System.out.println(System.currentTimeMillis() - start);
 	}

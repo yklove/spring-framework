@@ -91,6 +91,7 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	/**
 	 * Constant that indicates autowiring the greediest constructor that
 	 * can be satisfied (involves resolving the appropriate constructor).
+	 * 指示自动装配可以满足的最贪婪构造函数的常量(涉及解析适当的构造函数).
 	 * @see #createBean
 	 * @see #autowire
 	 */
