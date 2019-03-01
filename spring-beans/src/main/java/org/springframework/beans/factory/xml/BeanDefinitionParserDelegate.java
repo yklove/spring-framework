@@ -561,7 +561,7 @@ public class BeanDefinitionParserDelegate {
 			// 解析replace-method属性
 			parseReplacedMethodSubElements(ele, bd.getMethodOverrides());
 
-			// 解析构造函数参数
+			// 解析构造方法参数
 			parseConstructorArgElements(ele, bd);
 			// 解析property子元素
 			parsePropertyElements(ele, bd);
@@ -742,7 +742,7 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Parse constructor-arg sub-elements of the given bean element.
-	 * 解析构造函数参数
+	 * 解析构造方法参数
 	 */
 	public void parseConstructorArgElements(Element beanEle, BeanDefinition bd) {
 		NodeList nl = beanEle.getChildNodes();
@@ -840,7 +840,7 @@ public class BeanDefinitionParserDelegate {
 
 	/**
 	 * Parse a constructor-arg element.
-	 * 解析构造函数
+	 * 解析构造方法
 	 */
 	public void parseConstructorArgElement(Element ele, BeanDefinition bd) {
 		// 获取index属性
@@ -869,7 +869,7 @@ public class BeanDefinitionParserDelegate {
 							valueHolder.setName(nameAttr);
 						}
 						valueHolder.setSource(extractSource(ele));
-						// 不允许构造函数中的index参数相同
+						// 不允许构造方法中的index参数相同
 						if (bd.getConstructorArgumentValues().hasIndexedArgumentValue(index)) {
 							error("Ambiguous constructor-arg entries for index " + index, ele);
 						}

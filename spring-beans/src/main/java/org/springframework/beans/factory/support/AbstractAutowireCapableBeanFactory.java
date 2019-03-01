@@ -563,7 +563,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 *
 	 * bean创建是在这个方法中完成的
 	 * 实际上创建指定的bean.此时已经发生了预创建处理,例如检查{@code postProcessBeforeInstantiation}回调.
-	 * 区分默认bean实例化,使用工厂方法和自动装配构造函数.
+	 * 区分默认bean实例化,使用工厂方法和自动装配构造方法.
 	 *
 	 * @param beanName the name of the bean
 	 * @param mbd the merged bean definition for the bean
@@ -585,7 +585,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			instanceWrapper = this.factoryBeanInstanceCache.remove(beanName);
 		}
 		if (instanceWrapper == null) {
-			// 根据指定bean使用对应的策略创建新的实例,如:工厂方法,构造函数自动注入,简单初始化
+			// 根据指定bean使用对应的策略创建新的实例,如:工厂方法,构造方法自动注入,简单初始化
 			// 实例化bean,将BeanDefinition转换为BeanWrapper
 			instanceWrapper = createBeanInstance(beanName, mbd, args);
 		}
@@ -1183,9 +1183,9 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 	 * Create a new instance for the specified bean, using an appropriate instantiation strategy:
 	 * factory method, constructor autowiring, or simple instantiation.
 	 *
-	 * 使用适当的实例化策略为指定的bean创建新实例:工厂方法,构造函数自动装配或简单实例化.
+	 * 使用适当的实例化策略为指定的bean创建新实例:工厂方法,构造方法自动装配或简单实例化.
 	 * 如果存在工厂方法则使用工厂方法进行初始化.
-	 * 一个类有多个构造方法,每个构造函数有不同的参数,所以需要根据参数锁定构造方法进行初始化.
+	 * 一个类有多个构造方法,每个构造方法有不同的参数,所以需要根据参数锁定构造方法进行初始化.
 	 * 如果既不存在工厂方法,也不存在带有参数的构造方法,则使用默认的构造方法进行bean的实例化.
 	 *
 	 * @param beanName the name of the bean
@@ -1223,35 +1223,46 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		boolean autowireNecessary = false;
 		if (args == null) {
 			synchronized (mbd.constructorArgumentLock) {
+				// 一个类有多个构造方法,每个构造方法有不同的参数,所以调用前需要现根据参数锁定构造方法,或对应的工厂方法
 				if (mbd.resolvedConstructorOrFactoryMethod != null) {
 					resolved = true;
 					autowireNecessary = mbd.constructorArgumentsResolved;
 				}
 			}
 		}
+		// 如果已经解析过则使用解析好的构造方法方法,不需要再次锁定
 		if (resolved) {
 			if (autowireNecessary) {
+				// 构造方法自动注入
 				return autowireConstructor(beanName, mbd, null, null);
 			}
 			else {
+				// 使用默认的构造方法构造
 				return instantiateBean(beanName, mbd);
 			}
 		}
 
 		// Candidate constructors for autowiring?
+		// 自动装配的候选构造者?
+		// 需要根据参数解析构造方法
 		Constructor<?>[] ctors = determineConstructorsFromBeanPostProcessors(beanClass, beanName);
 		if (ctors != null || mbd.getResolvedAutowireMode() == AUTOWIRE_CONSTRUCTOR ||
 				mbd.hasConstructorArgumentValues() || !ObjectUtils.isEmpty(args)) {
+			// 构造方法自动注入
 			return autowireConstructor(beanName, mbd, ctors, args);
 		}
 
 		// Preferred constructors for default construction?
+		// 默认构造的首选构造函数?
 		ctors = mbd.getPreferredConstructors();
 		if (ctors != null) {
+			// 构造方法自动注入
 			return autowireConstructor(beanName, mbd, ctors, null);
 		}
 
 		// No special handling: simply use no-arg constructor.
+		// 没有特殊处理：只需使用no-arg构造方法.
+		// 使用默认构造方法构造
 		return instantiateBean(beanName, mbd);
 	}
 

@@ -107,12 +107,16 @@ class ConstructorResolver {
 	 * <p>This corresponds to constructor injection: In this mode, a Spring
 	 * bean factory is able to host components that expect constructor-based
 	 * dependency resolution.
+	 *
+	 * 带有参数的实例化
+	 *
 	 * @param beanName the name of the bean
 	 * @param mbd the merged bean definition for the bean
-	 * @param chosenCtors chosen candidate constructors (or {@code null} if none)
+	 * @param chosenCtors chosen candidate constructors (or {@code null} if none).选择的候选构造函数(如果没有,则为{@code null})
 	 * @param explicitArgs argument values passed in programmatically via the getBean method,
-	 * or {@code null} if none (-> use constructor argument values from bean definition)
-	 * @return a BeanWrapper for the new instance
+	 * or {@code null} if none (-> use constructor argument values from bean definition).
+	 * 通过getBean方法以编程方式传递的参数值,如果没有,则为{@code null} ( -> 使用bean定义中的构造函数参数值)
+	 * @return a BeanWrapper for the new instance.新实例的BeanWrapper.
 	 */
 	public BeanWrapper autowireConstructor(String beanName, RootBeanDefinition mbd,
 			@Nullable Constructor<?>[] chosenCtors, @Nullable Object[] explicitArgs) {
@@ -124,32 +128,46 @@ class ConstructorResolver {
 		ArgumentsHolder argsHolderToUse = null;
 		Object[] argsToUse = null;
 
+		// explicitArgs是通过getBean方法传入
+		// 如果存在,则直接使用该参数
 		if (explicitArgs != null) {
 			argsToUse = explicitArgs;
 		}
 		else {
+			// 尝试从配置文件中解析
 			Object[] argsToResolve = null;
+			// 尝试从缓存中获取
 			synchronized (mbd.constructorArgumentLock) {
 				constructorToUse = (Constructor<?>) mbd.resolvedConstructorOrFactoryMethod;
 				if (constructorToUse != null && mbd.constructorArgumentsResolved) {
 					// Found a cached constructor...
+					// 找到一个缓存的构造函数...
 					argsToUse = mbd.resolvedConstructorArguments;
 					if (argsToUse == null) {
+						// 配置的构造函数
 						argsToResolve = mbd.preparedConstructorArguments;
 					}
 				}
 			}
+			// 如果缓存中存在
 			if (argsToResolve != null) {
+				// 解析参数类型,如果给定方法的构造方法则通过此方法后就会把配置中的参数转换成指定类型
+				// 缓存中的值可能是原始值也可能是最终值
 				argsToUse = resolvePreparedArguments(beanName, mbd, bw, constructorToUse, argsToResolve, true);
 			}
 		}
 
+		// 没有被缓存
 		if (constructorToUse == null || argsToUse == null) {
 			// Take specified constructors, if any.
+			// 获取指定的构造方法(如果有).
 			Constructor<?>[] candidates = chosenCtors;
+			// 如果没有指定构造方法.
 			if (candidates == null) {
+				// 获取beanClass
 				Class<?> beanClass = mbd.getBeanClass();
 				try {
+					// 获取类的构造方法
 					candidates = (mbd.isNonPublicAccessAllowed() ?
 							beanClass.getDeclaredConstructors() : beanClass.getConstructors());
 				}
@@ -160,20 +178,29 @@ class ConstructorResolver {
 				}
 			}
 
+			// 如果只有一个构造方法,并且没有显示的传入参数,并且没有定义bean的构造方法参数值
 			if (candidates.length == 1 && explicitArgs == null && !mbd.hasConstructorArgumentValues()) {
+				// 获取唯一的构造方法
 				Constructor<?> uniqueCandidate = candidates[0];
+				// 如果构造方法的参数是0,没有参数
 				if (uniqueCandidate.getParameterCount() == 0) {
 					synchronized (mbd.constructorArgumentLock) {
+						// 将构造方法加入到缓存中
 						mbd.resolvedConstructorOrFactoryMethod = uniqueCandidate;
+						// 标记构造函数参数已解决
 						mbd.constructorArgumentsResolved = true;
+						// 已解析的构造函数参数是空的
 						mbd.resolvedConstructorArguments = EMPTY_ARGS;
 					}
+					// 设置实例化的bean
 					bw.setBeanInstance(instantiate(beanName, mbd, uniqueCandidate, EMPTY_ARGS));
+					// 返回
 					return bw;
 				}
 			}
 
 			// Need to resolve the constructor.
+			// 需要解析构造函数.
 			boolean autowiring = (chosenCtors != null ||
 					mbd.getResolvedAutowireMode() == AutowireCapableBeanFactory.AUTOWIRE_CONSTRUCTOR);
 			ConstructorArgumentValues resolvedValues = null;
@@ -286,6 +313,14 @@ class ConstructorResolver {
 		return bw;
 	}
 
+	/**
+	 * 实例化bean(BeanWrapper)
+	 * @param beanName beanName
+	 * @param mbd bean描述信息
+	 * @param constructorToUse 构造方法
+	 * @param argsToUse 参数
+	 * @return
+	 */
 	private Object instantiate(
 			String beanName, RootBeanDefinition mbd, Constructor constructorToUse, Object[] argsToUse) {
 
