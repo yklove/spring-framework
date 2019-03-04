@@ -947,6 +947,9 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	/**
 	 * Return whether this factory holds a InstantiationAwareBeanPostProcessor
 	 * that will get applied to singleton beans on shutdown.
+	 *
+	 * 返回此工厂是否拥有将在关闭时应用于单例bean的InstantiationAwareBeanPostProcessor。
+	 *
 	 * @see #addBeanPostProcessor
 	 * @see org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor
 	 */
@@ -1223,6 +1226,10 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
 	 * and populate bean instances.
 	 * <p>The default implementation delegates to {@link #registerCustomEditors}.
 	 * Can be overridden in subclasses.
+	 *
+	 * 使用在此工厂注册的自定义编辑器初始化给定的BeanWrapper.为将要创建和填充bean实例的BeanWrappers调用.
+	 * <p>默认实现委托给{@link #registerCustomEditors}.可以在子类中重写.
+	 *
 	 * @param bw the BeanWrapper to initialize
 	 */
 	protected void initBeanWrapper(BeanWrapper bw) {
