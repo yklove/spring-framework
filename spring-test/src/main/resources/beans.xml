@@ -2,18 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-	<bean id="person" class="cn.yklove.bean.Person" name="testPerson">
+	<bean id="personClient" class="cn.yklove.bean.Person" name="testPerson">
 		<description>当前bean的描述信息，便于阅读</description>
-		<property name="name" value="aaa"/>
-		<property name="age" value="1"/>
+		<property name="age" value="11"/>
+		<property name="name" value="name"/>
+		<!--<constructor-arg name="age" value="18"/>-->
+		<!--<constructor-arg name="name" value="test"/>-->
 	</bean>
-	<bean id="a" class="cn.yklove.bean.A">
-		<property name="b" ref="b"/>
-	</bean>
-	<bean id="b" class="cn.yklove.bean.B">
-		<property name="c" ref="c"/>
-	</bean>
-	<bean id="c" class="cn.yklove.bean.C">
-		<property name="a" ref="a"/>
-	</bean>
+
 </beans>

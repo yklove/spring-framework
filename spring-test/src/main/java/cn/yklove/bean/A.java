@@ -7,16 +7,7 @@ public class A {
 
 	private B b;
 
-	public B getB() {
-		return b;
-	}
-
-	public void setB(B b) {
+	public A(B b) {
 		this.b = b;
-	}
-
-	public void test(int i) {
-		System.out.println(i);
-		b.test(++i);
 	}
 }

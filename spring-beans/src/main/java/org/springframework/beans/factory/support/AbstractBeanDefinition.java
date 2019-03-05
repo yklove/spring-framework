@@ -546,6 +546,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Return whether this a <b>Singleton</b>, with a single shared instance
 	 * returned from all calls.
+	 *
+	 * 返回是否为单例
+	 *
 	 * @see #SCOPE_SINGLETON
 	 */
 	@Override
@@ -926,6 +929,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 
 	/**
 	 * Return if there are property values values defined for this bean.
+	 *
+	 * 如果为此bean定义了属性值,则返回.
+	 *
 	 * @since 5.0.2
 	 */
 	@Override
@@ -1043,6 +1049,9 @@ public abstract class AbstractBeanDefinition extends BeanMetadataAttributeAccess
 	/**
 	 * Return whether this bean definition is 'synthetic', that is,
 	 * not defined by the application itself.
+	 *
+	 * 返回此bean定义是否为"合成",即未由应用程序本身定义.
+	 *
 	 */
 	public boolean isSynthetic() {
 		return this.synthetic;

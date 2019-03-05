@@ -257,7 +257,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 			// 对singletonObjects加锁
 			synchronized (this.singletonObjects) {
 				singletonObject = this.earlySingletonObjects.get(beanName);
-				// 双重检查,因为有可能在加锁的过程中bean已经创建完了
+				// 如果此bean正在加载则不处理
 				// 如果允许对当前创建的单例进行早期引用
 				if (singletonObject == null && allowEarlyReference) {
 					// 根据beanName获取单例bean工厂

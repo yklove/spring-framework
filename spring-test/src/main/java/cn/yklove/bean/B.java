@@ -5,18 +5,9 @@ package cn.yklove.bean;
  */
 public class B {
 
-	private C c;
+	private A a;
 
-	public C getC() {
-		return c;
-	}
-
-	public void setC(C c) {
-		this.c = c;
-	}
-
-	public void test(int i) {
-		System.out.println(i);
-		c.test(++i);
+	public B(A a) {
+		this.a = a;
 	}
 }

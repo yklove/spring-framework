@@ -15,16 +15,16 @@ public class XmlBeanFactoryTest {
 	@Test
 	public void testXmlBeanFactory(){
 		BeanFactory beanFactory = new XmlBeanFactory(new ClassPathResource("beans.xml"));
-		Person person = (Person) beanFactory.getBean("person");
+		Person person = (Person) beanFactory.getBean("personClient");
 		System.out.println(person);
 
-		A a = (A) beanFactory.getBean("a");
-		System.out.println(a);
-		long start = System.currentTimeMillis();
-
+//		A a = (A) beanFactory.getBean("a");
+//		System.out.println(a);
+//		long start = System.currentTimeMillis();
+//
 //		a.test(1);
-
-		System.out.println(System.currentTimeMillis() - start);
+//
+//		System.out.println(System.currentTimeMillis() - start);
 	}
 
 }
