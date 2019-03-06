@@ -235,6 +235,7 @@ class ConstructorResolver {
 			Set<Constructor<?>> ambiguousConstructors = null;
 			LinkedList<UnsatisfiedDependencyException> causes = null;
 
+			// 遍历构造方法
 			for (Constructor<?> candidate : candidates) {
 				// 构造方法需要的参数
 				Class<?>[] paramTypes = candidate.getParameterTypes();
@@ -258,7 +259,7 @@ class ConstructorResolver {
 				if (resolvedValues != null) {
 					// 有参数则根据值构造对应参数类型的参数
 					try {
-						// 参数名,从注释上获取参数名称
+						// 参数名,从ConstructorProperties注解上获取参数名称
 						String[] paramNames = ConstructorPropertiesChecker.evaluate(candidate, paramTypes.length);
 						// 没有得到参数名
 						if (paramNames == null) {
@@ -761,6 +762,9 @@ class ConstructorResolver {
 	/**
 	 * Create an array of arguments to invoke a constructor or factory method,
 	 * given the resolved constructor argument values.
+	 *
+	 * 在给定已解析的构造函数参数值的情况下，创建一个参数数组以调用构造函数或工厂方法
+	 *
 	 */
 	private ArgumentsHolder createArgumentArray(
 			String beanName, RootBeanDefinition mbd, @Nullable ConstructorArgumentValues resolvedValues,
@@ -771,6 +775,7 @@ class ConstructorResolver {
 		TypeConverter converter = (customConverter != null ? customConverter : bw);
 
 		ArgumentsHolder args = new ArgumentsHolder(paramTypes.length);
+		// 待使用的ValueHolder
 		Set<ConstructorArgumentValues.ValueHolder> usedValueHolders = new HashSet<>(paramTypes.length);
 		Set<String> autowiredBeanNames = new LinkedHashSet<>(4);
 
@@ -778,12 +783,15 @@ class ConstructorResolver {
 			Class<?> paramType = paramTypes[paramIndex];
 			String paramName = (paramNames != null ? paramNames[paramIndex] : "");
 			// Try to find matching constructor argument value, either indexed or generic.
+			// 尝试查找匹配的构造函数参数值，索引或泛型。
 			ConstructorArgumentValues.ValueHolder valueHolder = null;
 			if (resolvedValues != null) {
 				valueHolder = resolvedValues.getArgumentValue(paramIndex, paramType, paramName, usedValueHolders);
 				// If we couldn't find a direct match and are not supposed to autowire,
 				// let's try the next generic, untyped argument value as fallback:
 				// it could match after type conversion (for example, String -> int).
+				// 如果我们找不到直接匹配并且不应该自动装配,让我们尝试下一个通用的无类型参数值作为备选方案：
+				// 它可以在类型转换后匹配（例如，String  -> int）。
 				if (valueHolder == null && (!autowiring || paramTypes.length == resolvedValues.getArgumentCount())) {
 					valueHolder = resolvedValues.getGenericArgumentValue(null, null, usedValueHolders);
 				}
@@ -791,9 +799,14 @@ class ConstructorResolver {
 			if (valueHolder != null) {
 				// We found a potential match - let's give it a try.
 				// Do not consider the same value definition multiple times!
+				// 我们找到了一个潜在的匹配 - 让我们试一试。
+				// 不要多次考虑相同的值定义！
 				usedValueHolders.add(valueHolder);
+				// 获取到最初的值
 				Object originalValue = valueHolder.getValue();
+				// 转换后的值
 				Object convertedValue;
+				// 如果 valueHolder 已经转换过了
 				if (valueHolder.isConverted()) {
 					convertedValue = valueHolder.getConvertedValue();
 					args.preparedArguments[paramIndex] = convertedValue;
@@ -801,6 +814,7 @@ class ConstructorResolver {
 				else {
 					MethodParameter methodParam = MethodParameter.forExecutable(executable, paramIndex);
 					try {
+						// 将原始的值转换成指定的类型
 						convertedValue = converter.convertIfNecessary(originalValue, paramType, methodParam);
 					}
 					catch (TypeMismatchException ex) {
@@ -995,6 +1009,10 @@ class ConstructorResolver {
 			// Try type difference weight on both the converted arguments and
 			// the raw arguments. If the raw weight is better, use it.
 			// Decrease raw weight by 1024 to prefer it over equal converted weight.
+			// 如果找到有效参数，则确定类型差异权重。
+			// 尝试对转换后的参数和原始参数进行类型差异权重。
+			// 如果原始重量更好，请使用它。
+			// 将原始重量减少1024，优先于相等的转换重量。
 			int typeDiffWeight = MethodInvoker.getTypeDifferenceWeight(paramTypes, this.arguments);
 			int rawTypeDiffWeight = MethodInvoker.getTypeDifferenceWeight(paramTypes, this.rawArguments) - 1024;
 			return (rawTypeDiffWeight < typeDiffWeight ? rawTypeDiffWeight : typeDiffWeight);

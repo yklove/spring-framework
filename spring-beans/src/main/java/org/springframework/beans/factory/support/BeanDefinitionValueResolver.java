@@ -97,6 +97,9 @@ class BeanDefinitionValueResolver {
 	 * <li>A ManagedMap. In this case the value may be a RuntimeBeanReference
 	 * or Collection that will need to be resolved.
 	 * <li>An ordinary object or {@code null}, in which case it's left alone.
+	 *
+	 * 给定PropertyValue,返回一个值,如有必要,解析对工厂中其他bean的任何引用.
+	 *
 	 * @param argName the name of the argument that the value is defined for
 	 * @param value the value object to resolve
 	 * @return the resolved object
@@ -187,6 +190,7 @@ class BeanDefinitionValueResolver {
 		}
 		else if (value instanceof TypedStringValue) {
 			// Convert value to target type here.
+			// 在此处将值转换为目标类型.
 			TypedStringValue typedStringValue = (TypedStringValue) value;
 			Object valueObject = evaluate(typedStringValue);
 			try {
@@ -215,8 +219,11 @@ class BeanDefinitionValueResolver {
 
 	/**
 	 * Evaluate the given value as an expression, if necessary.
+	 *
+	 * 如有必要，将给定值评估为表达式.
+	 *
 	 * @param value the candidate value (may be an expression)
-	 * @return the resolved value
+	 * @return the resolved value.已解决的价值.
 	 */
 	@Nullable
 	protected Object evaluate(TypedStringValue value) {

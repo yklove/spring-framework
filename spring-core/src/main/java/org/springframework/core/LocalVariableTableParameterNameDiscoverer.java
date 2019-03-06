@@ -61,6 +61,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 	private static final Map<Member, String[]> NO_DEBUG_INFO_MAP = Collections.emptyMap();
 
 	// the cache uses a nested index (value is a map) to keep the top level cache relatively small in size
+	// 缓存 类 -> 方法 -> 参数名
 	private final Map<Class<?>, Map<Member, String[]>> parameterNamesCache = new ConcurrentHashMap<>(32);
 
 
@@ -86,6 +87,7 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 		Class<?> declaringClass = ctor.getDeclaringClass();
 		Map<Member, String[]> map = this.parameterNamesCache.get(declaringClass);
 		if (map == null) {
+			// 初始化 map，解析类中所有的方法和参数名
 			map = inspectClass(declaringClass);
 			this.parameterNamesCache.put(declaringClass, map);
 		}
@@ -98,6 +100,9 @@ public class LocalVariableTableParameterNameDiscoverer implements ParameterNameD
 	/**
 	 * Inspects the target class. Exceptions will be logged and a maker map returned
 	 * to indicate the lack of debug information.
+	 *
+	 * 讲一个类的所有方法和参数名包装成一个 map 返回
+	 * 方法 -> 所有的参数名
 	 */
 	private Map<Member, String[]> inspectClass(Class<?> clazz) {
 		InputStream is = clazz.getResourceAsStream(ClassUtils.getClassFileName(clazz));

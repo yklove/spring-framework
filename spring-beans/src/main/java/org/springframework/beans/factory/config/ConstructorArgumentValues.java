@@ -337,6 +337,9 @@ public class ConstructorArgumentValues {
 	/**
 	 * Look for an argument value that either corresponds to the given index
 	 * in the constructor argument list or generically matches by type.
+	 *
+	 * 获取参数值，首先从 IndexedArgumentValue 获取，如果没有获取到，则从 GenericArgumentValue 中获取。
+	 *
 	 * @param index the index in the constructor argument list
 	 * @param requiredType the parameter type to match (can be {@code null}
 	 * to find an untyped argument value)
