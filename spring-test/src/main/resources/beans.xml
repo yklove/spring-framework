@@ -6,8 +6,12 @@
 		<description>当前bean的描述信息，便于阅读</description>
 		<property name="age" value="11"/>
 		<property name="name" value="name"/>
-		<!--<constructor-arg name="age" value="18"/>-->
-		<!--<constructor-arg name="name" value="test"/>-->
+		<constructor-arg name="age" value="18"/>
+		<constructor-arg name="name" value="test"/>
+	</bean>
+	<bean id="personClient2" class="cn.yklove.bean.Person">
+		<description>当前bean的描述信息，便于阅读</description>
+		<constructor-arg name="name" value="test"/>
 	</bean>
 
 </beans>

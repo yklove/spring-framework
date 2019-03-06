@@ -45,6 +45,10 @@ public class Person extends PersonSuper{
 		this.age = age;
 	}
 
+	public Person(String name) {
+		this.name = name;
+	}
+
 	@Override
 	public void testMethod() {
 		super.testMethod();

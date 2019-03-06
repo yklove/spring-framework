@@ -674,7 +674,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 						}
 					}
 					// 因为bean创建后其所依赖的bean一定是已经创建的,
-					// actualDependentBeans不为空则表示当前bean创建后其依赖的bean却没有全部创建完,,也就是说存在循环依赖
+					// actualDependentBeans不为空则表示当前bean创建后其依赖的bean却没有全部创建完,也就是说存在循环依赖
 					if (!actualDependentBeans.isEmpty()) {
 						throw new BeanCurrentlyInCreationException(beanName,
 								"Bean with name '" + beanName + "' has been injected into other beans [" +

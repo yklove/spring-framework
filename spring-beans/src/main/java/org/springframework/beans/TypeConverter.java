@@ -30,6 +30,10 @@ import org.springframework.lang.Nullable;
  * {@link java.beans.PropertyEditor PropertyEditors} which aren't thread-safe,
  * TypeConverters themselves are <em>not</em> to be considered as thread-safe either.
  *
+ * <p>定义类型转换方法的接口。通常（但不一定）与PropertyEditorRegistry接口一起实现。</p>
+ *
+ * <p>注意：由于TypeConverter实现通常基于 PropertyEditors不是线程安全的，因此TypeConverters本身也不被视为线程安全。</p>
+ *
  * @author Juergen Hoeller
  * @since 2.0
  * @see SimpleTypeConverter
@@ -41,9 +45,14 @@ public interface TypeConverter {
 	 * Convert the value to the required type (if necessary from a String).
 	 * <p>Conversions from String to any type will typically use the {@code setAsText}
 	 * method of the PropertyEditor class, or a Spring Converter in a ConversionService.
-	 * @param value the value to convert
+	 *
+	 * <p>将值转换为所需类型（如果需要，从String）。</p>
+	 * <p>从String到任何类型的转换通常使用setAsText PropertyEditor类的方法或ConversionService中的Spring Converter。</p>
+	 *
+	 * @param value the value to convert.要转换的价值.
 	 * @param requiredType the type we must convert to
-	 * (or {@code null} if not known, for example in case of a collection element)
+	 * (or {@code null} if not known, for example in case of a collection element).
+	 * 我们必须转换为的类型（或者null如果不知道，例如在集合元素的情况下）
 	 * @return the new value, possibly the result of type conversion
 	 * @throws TypeMismatchException if type conversion failed
 	 * @see java.beans.PropertyEditor#setAsText(String)
@@ -58,11 +67,17 @@ public interface TypeConverter {
 	 * Convert the value to the required type (if necessary from a String).
 	 * <p>Conversions from String to any type will typically use the {@code setAsText}
 	 * method of the PropertyEditor class, or a Spring Converter in a ConversionService.
-	 * @param value the value to convert
+	 *
+	 * <p>将值转换为所需类型（如果需要，从String）。</p>
+	 * <p>从String到任何类型的转换通常使用setAsText PropertyEditor类的方法或ConversionService中的Spring Converter。</p>
+	 *
+	 * @param value the value to convert.要转换的价值.
 	 * @param requiredType the type we must convert to
 	 * (or {@code null} if not known, for example in case of a collection element)
+	 * 我们必须转换为的类型（或者null如果不知道，例如在集合元素的情况下）
 	 * @param methodParam the method parameter that is the target of the conversion
 	 * (for analysis of generic types; may be {@code null})
+	 * 作为转换目标的方法参数（用于分析泛型类型;可能null）
 	 * @return the new value, possibly the result of type conversion
 	 * @throws TypeMismatchException if type conversion failed
 	 * @see java.beans.PropertyEditor#setAsText(String)

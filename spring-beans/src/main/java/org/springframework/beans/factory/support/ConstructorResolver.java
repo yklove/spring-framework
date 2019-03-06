@@ -145,7 +145,9 @@ class ConstructorResolver {
 				if (constructorToUse != null && mbd.constructorArgumentsResolved) {
 					// Found a cached constructor...
 					// 找到一个缓存的构造函数...
+					// 获取缓存的构造函数参数
 					argsToUse = mbd.resolvedConstructorArguments;
+					// 如果缓存的构造函数参数是空的
 					if (argsToUse == null) {
 						// 配置的构造函数
 						argsToResolve = mbd.preparedConstructorArguments;
@@ -715,6 +717,7 @@ class ConstructorResolver {
 
 		int minNrOfArgs = cargs.getArgumentCount();
 
+		// 遍历 constructor-arg 标签的 index 属性
 		for (Map.Entry<Integer, ConstructorArgumentValues.ValueHolder> entry : cargs.getIndexedArgumentValues().entrySet()) {
 			int index = entry.getKey();
 			if (index < 0) {
