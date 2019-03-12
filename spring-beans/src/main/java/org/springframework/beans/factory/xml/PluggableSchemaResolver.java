@@ -111,7 +111,7 @@ public class PluggableSchemaResolver implements EntityResolver {
 
 	@Override
 	@Nullable
-	public InputSource resolveEntity(String publicId, @Nullable String systemId) throws IOException {
+	public InputSource resolveEntity(@Nullable String publicId, @Nullable String systemId) throws IOException {
 		if (logger.isTraceEnabled()) {
 			logger.trace("Trying to resolve XML entity with public id [" + publicId +
 					"] and system id [" + systemId + "]");
@@ -120,6 +120,11 @@ public class PluggableSchemaResolver implements EntityResolver {
 		if (systemId != null) {
 			// 获取本地的schemas文件位置
 			String resourceLocation = getSchemaMappings().get(systemId);
+			if (resourceLocation == null && systemId.startsWith("https:")) {
+				// Retrieve canonical http schema mapping even for https declaration
+				// https 转换到 http
+				resourceLocation = getSchemaMappings().get("http:" + systemId.substring(6));
+			}
 			// 如果存在这样的一个文件位置
 			if (resourceLocation != null) {
 				// 加载文件
