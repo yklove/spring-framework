@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,7 +20,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Test;
@@ -47,28 +46,14 @@ import static org.junit.Assert.*;
  */
 public class BeanUtilsTests {
 
-	@Test
-	public void testInstantiateClass() {
-		// give proper class
-		BeanUtils.instantiateClass(ArrayList.class);
+	@Test(expected = FatalBeanException.class)
+	public void testInstantiateClassGivenInterface() {
+		BeanUtils.instantiateClass(List.class);
+	}
 
-		try {
-			// give interface
-			BeanUtils.instantiateClass(List.class);
-			fail("Should have thrown FatalBeanException");
-		}
-		catch (FatalBeanException ex) {
-			// expected
-		}
-
-		try {
-			// give class without default constructor
-			BeanUtils.instantiateClass(CustomDateEditor.class);
-			fail("Should have thrown FatalBeanException");
-		}
-		catch (FatalBeanException ex) {
-			// expected
-		}
+	@Test(expected = FatalBeanException.class)
+	public void testInstantiateClassGivenClassWithoutDefaultConstructor() {
+		BeanUtils.instantiateClass(CustomDateEditor.class);
 	}
 
 	@Test  // gh-22531
@@ -233,23 +218,14 @@ public class BeanUtilsTests {
 		assertSignatureEquals(desiredMethod, "doSomething()");
 	}
 
-	@Test
-	public void testResolveInvalidSignature() throws Exception {
-		try {
-			BeanUtils.resolveSignature("doSomething(", MethodSignatureBean.class);
-			fail("Should not be able to parse with opening but no closing paren.");
-		}
-		catch (IllegalArgumentException ex) {
-			// success
-		}
+	@Test(expected = IllegalArgumentException.class)
+	public void testResolveInvalidSignatureEndParen() {
+		BeanUtils.resolveSignature("doSomething(", MethodSignatureBean.class);
+	}
 
-		try {
-			BeanUtils.resolveSignature("doSomething)", MethodSignatureBean.class);
-			fail("Should not be able to parse with closing but no opening paren.");
-		}
-		catch (IllegalArgumentException ex) {
-			// success
-		}
+	@Test(expected = IllegalArgumentException.class)
+	public void testResolveInvalidSignatureStartParen() {
+		BeanUtils.resolveSignature("doSomething)", MethodSignatureBean.class);
 	}
 
 	@Test
@@ -473,19 +449,6 @@ public class BeanUtilsTests {
 		}
 	}
 
-	private static class BeanWithSingleNonDefaultConstructor {
-
-		private final String name;
-
-		public BeanWithSingleNonDefaultConstructor(String name) {
-			this.name = name;
-		}
-
-		public String getName() {
-			return name;
-		}
-	}
-
 	private static class BeanWithNullableTypes {
 
 		private Integer counter;
@@ -494,6 +457,7 @@ public class BeanUtilsTests {
 
 		private String value;
 
+		@SuppressWarnings("unused")
 		public BeanWithNullableTypes(@Nullable Integer counter, @Nullable Boolean flag, String value) {
 			this.counter = counter;
 			this.flag = flag;
@@ -523,6 +487,7 @@ public class BeanUtilsTests {
 
 		private String value;
 
+		@SuppressWarnings("unused")
 		public BeanWithPrimitiveTypes(int counter, boolean flag, String value) {
 			this.counter = counter;
 			this.flag = flag;

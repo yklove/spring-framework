@@ -28,11 +28,13 @@ correct schema so that the tags in the `util` namespace are available to you):
 	<?xml version="1.0" encoding="UTF-8"?>
 	<beans xmlns="http://www.springframework.org/schema/beans"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		__xmlns:util="http://www.springframework.org/schema/util"__ xsi:schemaLocation="
-			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-			__http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd"__>
+		xmlns:util="http://www.springframework.org/schema/util"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd">
 
 			<!-- bean definitions here -->
+
 	</beans>
 ----
 
@@ -517,11 +519,13 @@ are available to you):
 	<?xml version="1.0" encoding="UTF-8"?>
 	<beans xmlns="http://www.springframework.org/schema/beans"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		__xmlns:aop="http://www.springframework.org/schema/aop"__ xsi:schemaLocation="
-			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-			__http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd"__>
+		xmlns:aop="http://www.springframework.org/schema/aop"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/aop https://www.springframework.org/schema/aop/spring-aop.xsd">
 
 		<!-- bean definitions here -->
+
 	</beans>
 ----
 
@@ -542,11 +546,13 @@ available to you:
 	<?xml version="1.0" encoding="UTF-8"?>
 	<beans xmlns="http://www.springframework.org/schema/beans"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		__xmlns:context="http://www.springframework.org/schema/context"__ xsi:schemaLocation="
-			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-			__http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd"__>
+		xmlns:context="http://www.springframework.org/schema/context"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
 		<!-- bean definitions here -->
+
 	</beans>
 ----
 
@@ -637,7 +643,7 @@ as it stands).
 	<beans xmlns="http://www.springframework.org/schema/beans"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="
-			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+			http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd">
 
 		<bean id="foo" class="x.y.Foo">
 			<meta key="cacheName" value="foo"/> <1>
@@ -810,7 +816,7 @@ use the `NamespaceHandlerSupport` class:
 	public class MyNamespaceHandler extends NamespaceHandlerSupport {
 
 		public void init() {
-			**registerBeanDefinitionParser("dateformat", new SimpleDateFormatBeanDefinitionParser());**
+			registerBeanDefinitionParser("dateformat", new SimpleDateFormatBeanDefinitionParser());
 		}
 
 	}
@@ -955,7 +961,7 @@ in a Spring XML configuration file:
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xmlns:myns="http://www.mycompany.com/schema/myns"
 		xsi:schemaLocation="
-			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 			http://www.mycompany.com/schema/myns http://www.mycompany.com/schema/myns/myns.xsd">
 
 		<!-- as a top-level bean -->
@@ -994,7 +1000,7 @@ to satisfy a target of the following configuration:
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xmlns:foo="http://www.foo.com/schema/component"
 		xsi:schemaLocation="
-			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+			http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 			http://www.foo.com/schema/component http://www.foo.com/schema/component/component.xsd">
 
 		<foo:component id="bionic-family" name="Bionic-1">
@@ -1223,7 +1229,7 @@ want to add an additional attribute to the existing bean definition element.
 
 By way of another example, suppose that you define a bean definition for a
 service object that (unknown to it) accesses a clustered
-http://jcp.org/en/jsr/detail?id=107[JCache], and you want to ensure that the
+https://jcp.org/en/jsr/detail?id=107[JCache], and you want to ensure that the
 named JCache instance is eagerly started within the surrounding cluster.
 The following listing shows such a definition:
 

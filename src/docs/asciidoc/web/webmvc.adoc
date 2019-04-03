@@ -691,7 +691,7 @@ redirect is needed. The rest of the view name is the redirect URL.
 The net effect is the same as if the controller had returned a `RedirectView`, but now
 the controller itself can operate in terms of logical view names. A logical view
 name (such as `redirect:/myapp/some/resource`) redirects relative to the current
-Servlet context, while a name such as `redirect:http://myhost.com/some/arbitrary/path`
+Servlet context, while a name such as `redirect:https://myhost.com/some/arbitrary/path`
 redirects to an absolute URL.
 
 Note that, if a controller method is annotated with the `@ResponseStatus`, the annotation
@@ -853,7 +853,7 @@ You can enable changing of locales by adding the `LocaleChangeInterceptor` to on
 accordingly, calling the `setLocale` method on the `LocaleResolver` in the dispatcher's
 application context. The next example shows that calls to all `{asterisk}.view` resources
 that contain a parameter named `siteLanguage` now changes the locale. So, for example,
-a request for the URL, `http://www.sf.net/home.view?siteLanguage=nl`, changes the site
+a request for the URL, `https://www.sf.net/home.view?siteLanguage=nl`, changes the site
 language to Dutch. The following example shows how to intercept the locale:
 
 [source,xml,indent=0]
@@ -979,7 +979,7 @@ request with a simple request parameter.
 
 `MultipartResolver` from the `org.springframework.web.multipart` package is a strategy
 for parsing multipart requests including file uploads. There is one implementation
-based on http://jakarta.apache.org/commons/fileupload[Commons FileUpload] and another
+based on https://jakarta.apache.org/commons/fileupload[Commons FileUpload] and another
 based on Servlet 3.0 multipart request parsing.
 
 To enable multipart handling, you need to declare a `MultipartResolver` bean in your
@@ -1239,9 +1239,9 @@ The following example shows the XML configuration equivalent of the preceding ex
 		xmlns:context="http://www.springframework.org/schema/context"
 		xsi:schemaLocation="
 			http://www.springframework.org/schema/beans
-			http://www.springframework.org/schema/beans/spring-beans.xsd
+			https://www.springframework.org/schema/beans/spring-beans.xsd
 			http://www.springframework.org/schema/context
-			http://www.springframework.org/schema/context/spring-context.xsd">
+			https://www.springframework.org/schema/context/spring-context.xsd">
 
 		<context:component-scan base-package="org.example.web"/>
 
@@ -1259,7 +1259,7 @@ directly to the response body versus view resolution and rendering with an HTML 
 [[mvc-ann-requestmapping-proxying]]
 ==== AOP Proxies
 
-In some cases, you many need to decorate a controller with an AOP proxy at runtime.
+In some cases, you may need to decorate a controller with an AOP proxy at runtime.
 One example is if you choose to have `@Transactional` annotations directly on the
 controller. When this is the case, for controllers specifically, we recommend
 using class-based proxying. This is typically the default choice with controllers.
@@ -1403,7 +1403,7 @@ sorted last. Also, prefix patterns (such as `/public/{asterisk}{asterisk}`) are 
 specific than other pattern that do not have double wildcards.
 
 For the full details, see {api-spring-framework}/util/AntPathMatcher.AntPatternComparator.html[`AntPatternComparator`]
-in {api-spring-framework}/util/AntPathMatcher.html[`AntPathMatcher`] and also keep mind that
+in {api-spring-framework}/util/AntPathMatcher.html[`AntPathMatcher`] and also keep in mind that
 you can customize the {api-spring-framework}/util/PathMatcher.html[`PathMatcher`] implementation.
 See <<mvc-config-path-matching>> in the configuration section.
 
@@ -1462,7 +1462,7 @@ Many common path extensions are whitelisted by default. Applications with custom
 negotiation to avoid having a `Content-Disposition` header added for those extensions.
 See <<mvc-config-content-negotiation>>.
 
-See http://pivotal.io/security/cve-2015-5211[CVE-2015-5211] for additional
+See https://pivotal.io/security/cve-2015-5211[CVE-2015-5211] for additional
 recommendations related to RFD.
 
 
@@ -1482,7 +1482,6 @@ as the following example shows:
 	}
 ----
 <1> Using a `consumes` attribute to narrow the mapping by the content type.
-
 
 The `consumes` attribute also supports negation expressions -- for example, `!text/plain` means any
 content type other than `text/plain`.
@@ -1512,7 +1511,6 @@ content types that a controller method produces, as the following example shows:
 	}
 ----
 <1> Using a `produces` attribute to narrow the mapping by the content type.
-
 
 The media type can specify a character set. Negated expressions are supported -- for example,
 `!text/plain` means any content type other than "text/plain".
@@ -1548,7 +1546,6 @@ specific value (`myParam=myValue`). The following example shows how to test for 
 ----
 <1> Testing whether `myParam` equals `myValue`.
 
-
 You can also use the same with request header conditions, as the following example shows:
 
 [source,java,indent=0]
@@ -1560,7 +1557,6 @@ You can also use the same with request header conditions, as the following examp
 	}
 ----
 <1> Testing whether `myHeader` equals `myValue`.
-
 
 TIP: You can match `Content-Type` and `Accept` with the headers condition, but it is better to use
 <<mvc-ann-requestmapping-consumes, consumes>> and <<mvc-ann-requestmapping-produces, produces>>
@@ -1647,7 +1643,6 @@ public class MyConfig {
 <2> Prepare the request mapping meta data.
 <3> Get the handler method.
 <4> Add the registration.
-
 
 
 
@@ -1914,9 +1909,9 @@ See <<core.adoc#format, Spring Field Formatting>>.
 ==== Matrix Variables
 [.small]#<<web-reactive.adoc#webflux-ann-matrix-variables, Same as in Spring WebFlux>>#
 
-http://tools.ietf.org/html/rfc3986#section-3.3[RFC 3986] discusses name-value pairs in
+https://tools.ietf.org/html/rfc3986#section-3.3[RFC 3986] discusses name-value pairs in
 path segments. In Spring MVC, we refer to those as "`matrix variables`" based on an
-http://www.w3.org/DesignIssues/MatrixURIs.html["`old post`"] by Tim Berners-Lee, but they
+https://www.w3.org/DesignIssues/MatrixURIs.html["`old post`"] by Tim Berners-Lee, but they
 can be also be referred to as URI path parameters.
 
 Matrix variables can appear in any path segment, with each variable separated by a semicolon and
@@ -2018,7 +2013,7 @@ The following example shows how to do so:
 		// ...
 
 		@GetMapping
-		public String setupForm(**@RequestParam("petId") int petId**, Model model) { <1>
+		public String setupForm(@RequestParam("petId") int petId, Model model) { <1>
 			Pet pet = this.clinic.loadPet(petId);
 			model.addAttribute("pet", pet);
 			return "petForm";
@@ -2029,7 +2024,6 @@ The following example shows how to do so:
 	}
 ----
 <1> Using `@RequestParam` to bind `petId`.
-
 
 By default, method parameters that use this annotation are required, but you can specify that
 a method parameter is optional by setting the `@RequestParam` annotation's `required` flag to
@@ -2087,7 +2081,6 @@ The following example gets the value of the `Accept-Encoding` and `Keep-Alive` h
 <1> Get the value of the `Accept-Encoding` header.
 <2> Get the value of the `Keep-Alive` header.
 
-
 If the target method parameter type is not
 `String`, type conversion is automatically applied. See <<mvc-ann-typeconversion>>.
 
@@ -2128,20 +2121,19 @@ The following example shows how to get the cookie value:
 ----
 <1> Get the value of the `JSESSIONID` cookie.
 
-
-if the target method parameter type is not
-`String`, type conversion is applied automatically. See <<mvc-ann-typeconversion>>.
+If the target method parameter type is not `String`, type conversion is applied automatically.
+See <<mvc-ann-typeconversion>>.
 
 
 [[mvc-ann-modelattrib-method-args]]
 ==== `@ModelAttribute`
 [.small]#<<web-reactive.adoc#webflux-ann-modelattrib-method-args, Same as in Spring WebFlux>>#
 
-You can use the `@ModelAttribute` annotation on a method argument to access an attribute from the
-model or have it be instantiated if not present. The model attribute is also overlain with
-values from HTTP Servlet request parameters whose names match to field names. This is
-referred to as data binding, and it saves you from having to deal with parsing and
-converting individual query parameters and form fields. The following example shows how to do so:
+You can use the `@ModelAttribute` annotation on a method argument to access an attribute from
+the model or have it be instantiated if not present. The model attribute is also overlain with
+values from HTTP Servlet request parameters whose names match to field names. This is referred
+to as data binding, and it saves you from having to deal with parsing and converting individual
+query parameters and form fields. The following example shows how to do so:
 
 [source,java,indent=0]
 [subs="verbatim,quotes"]
@@ -2150,7 +2142,6 @@ converting individual query parameters and form fields. The following example sh
 	public String processSubmit(@ModelAttribute Pet pet) { } <1>
 ----
 <1> Bind an instance of `Pet`.
-
 
 The `Pet` instance above is resolved as follows:
 
@@ -2201,7 +2192,6 @@ to the `@ModelAttribute`, as the following example shows:
 ----
 <1> Adding a `BindingResult` next to the `@ModelAttribute`.
 
-
 In some cases, you may want access to a model attribute without data binding. For such
 cases, you can inject the `Model` into the controller and access it directly or,
 alternatively, set `@ModelAttribute(binding=false)`, as the following example shows:
@@ -2227,7 +2217,6 @@ alternatively, set `@ModelAttribute(binding=false)`, as the following example sh
 ----
 <1> Setting `@ModelAttribute(binding=false)`.
 
-
 You can automatically apply validation after data binding by adding the
 `javax.validation.Valid` annotation or Spring's `@Validated` annotation (
 <<core.adoc#validation-beanvalidation, Bean Validation>> and
@@ -2245,7 +2234,6 @@ You can automatically apply validation after data binding by adding the
 	}
 ----
 <1> Validate the `Pet` instance.
-
 
 Note that using `@ModelAttribute` is optional (for example, to set its attributes).
 By default, any argument that is not a simple value type (as determined by
@@ -2277,7 +2265,6 @@ The following example uses the `@SessionAttributes` annotation:
 ----
 <1> Using the `@SessionAttributes` annotation.
 
-
 On the first request, when a model attribute with the name, `pet`, is added to the model,
 it is automatically promoted to and saved in the HTTP Servlet session. It remains there
 until another controller method uses a `SessionStatus` method argument to clear the
@@ -2307,7 +2294,6 @@ storage, as the following example shows:
 <2> Clearing the `Pet` value from the Servlet session.
 
 
-
 [[mvc-ann-sessionattribute]]
 ==== `@SessionAttribute`
 [.small]#<<web-reactive.adoc#webflux-ann-sessionattribute, Same as in Spring WebFlux>>#
@@ -2326,7 +2312,6 @@ as the following example shows:
 	}
 ----
 <1> Using a `@SessionAttribute` annotation.
-
 
 For use cases that require adding or removing session attributes, consider injecting
 `org.springframework.web.context.request.WebRequest` or
@@ -2354,7 +2339,6 @@ or `HandlerInterceptor`):
 	}
 ----
 <1> Using the `@RequestAttribute` annotation.
-
 
 
 [[mvc-redirecting-passing-data]]
@@ -2413,11 +2397,11 @@ Spring MVC has two main abstractions in support of flash attributes. `FlashMap` 
 to hold flash attributes, while `FlashMapManager` is used to store, retrieve, and manage
 `FlashMap` instances.
 
-Flash attribute support is always "`on`" and does not need to enabled explicitly. However,
-if not used, it never causes HTTP session creation. On each request, there is an "`input`"
-`FlashMap` with attributes passed from a previous request (if any) and an "`output`"
-`FlashMap` with attributes to save for a subsequent request. Both `FlashMap` instances
-are accessible from anywhere in Spring MVC through static methods in
+Flash attribute support is always "`on`" and does not need to be enabled explicitly.
+However, if not used, it never causes HTTP session creation. On each request, there is an
+"`input`" `FlashMap` with attributes passed from a previous request (if any) and an
+"`output`" `FlashMap` with attributes to save for a subsequent request. Both `FlashMap`
+instances are accessible from anywhere in Spring MVC through static methods in
 `RequestContextUtils`.
 
 Annotated controllers typically do not need to work with `FlashMap` directly. Instead, a
@@ -2550,8 +2534,8 @@ probably want it deserialized from JSON (similar to `@RequestBody`). Use the
 [subs="verbatim,quotes"]
 ----
 @PostMapping("/")
-public String handle(**@RequestPart("meta-data") MetaData metadata,
-		@RequestPart("file-data") MultipartFile file**) {
+public String handle(@RequestPart("meta-data") MetaData metadata,
+		@RequestPart("file-data") MultipartFile file) {
 	// ...
 }
 ----
@@ -2567,8 +2551,8 @@ as the following example shows:
 [subs="verbatim,quotes"]
 ----
 @PostMapping("/")
-public String handle(**@Valid** @RequestPart("meta-data") MetaData metadata,
-		**BindingResult result**) {
+public String handle(@Valid @RequestPart("meta-data") MetaData metadata,
+		BindingResult result) {
 	// ...
 }
 ----
@@ -2693,7 +2677,7 @@ Spring offers support for the Jackson JSON library.
 [.small]#<<web-reactive.adoc#webflux-ann-jsonview, Same as in Spring WebFlux>>#
 
 Spring MVC provides built-in support for
-http://wiki.fasterxml.com/JacksonJsonViews[Jackson's Serialization Views],
+https://wiki.fasterxml.com/JacksonJsonViews[Jackson's Serialization Views],
 which allow rendering only a subset of all fields in an `Object`. To use it with
 `@ResponseBody` or `ResponseEntity` controller methods, you can use Jackson's
 `@JsonView` annotation to activate a serialization view class, as the following example shows:
@@ -2872,7 +2856,6 @@ The following listing shows an example:
 ----
 <1> Defining an `@InitBinder` method.
 
-
 Alternatively, when you use a `Formatter`-based setup through a shared
 `FormattingConversionService`, you can re-use the same approach and register
 controller-specific `Formatter` implementations, as the following example shows:
@@ -2892,7 +2875,6 @@ controller-specific `Formatter` implementations, as the following example shows:
 	}
 ----
 <1> Defining an `@InitBinder` method on a custom formatter.
-
 
 
 
@@ -3609,7 +3591,7 @@ invokes the configured exception resolvers and completes the request.
 ==== SSE
 
 `SseEmitter` (a subclass of `ResponseBodyEmitter`) provides support for
-http://www.w3.org/TR/eventsource/[Server-Sent Events], where events sent from the server
+https://www.w3.org/TR/eventsource/[Server-Sent Events], where events sent from the server
 are formatted according to the W3C SSE specification. To produce an SSE
 stream from a controller, return `SseEmitter`, as the following example shows:
 
@@ -3709,7 +3691,7 @@ suitable under load. If you plan to stream with a reactive type, you should use 
 
 The Servlet API does not provide any notification when a remote client goes away.
 Therefore, while streaming to the response, whether through <<mvc-ann-async-sse, SseEmitter>>
-or <<mvc-ann-async-reactive-types, reactive types>, it is important to send data periodically,
+or <<mvc-ann-async-reactive-types, reactive types>>, it is important to send data periodically,
 since the write fails if the client has disconnected. The send could take the form of an
 empty (comment-only) SSE event or any other data that the other side would have to interpret
 as a heartbeat and ignore.
@@ -3775,7 +3757,7 @@ include::webmvc-cors.adoc[leveloffset=+1]
 == Web Security
 [.small]#<<web-reactive.adoc#webflux-web-security, Same as in Spring WebFlux>>#
 
-The http://projects.spring.io/spring-security/[Spring Security] project provides support
+The https://projects.spring.io/spring-security/[Spring Security] project provides support
 for protecting web applications from malicious exploits. See the Spring Security
 reference documentation, including:
 
@@ -3784,7 +3766,7 @@ reference documentation, including:
 * {doc-spring-security}/html5/#csrf[CSRF protection]
 * {doc-spring-security}/html5/#headers[Security Response Headers]
 
-http://hdiv.org/[HDIV] is another web security framework that integrates with Spring MVC.
+https://hdiv.org/[HDIV] is another web security framework that integrates with Spring MVC.
 
 
 
@@ -3901,7 +3883,6 @@ as the following example shows:
 <2> The response has been set to 304 (NOT_MODIFIED) -- no further processing.
 <3> Continue with the request processing.
 
-
 There are three variants for checking conditional requests against `eTag` values, `lastModified`
 values, or both. For conditional `GET` and `HEAD` requests, you can set the response to
 304 (NOT_MODIFIED). For conditional `POST`, `PUT`, and `DELETE`, you can instead set the response
@@ -3973,9 +3954,9 @@ configuration, as the following example shows:
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="
 			http://www.springframework.org/schema/beans
-			http://www.springframework.org/schema/beans/spring-beans.xsd
+			https://www.springframework.org/schema/beans/spring-beans.xsd
 			http://www.springframework.org/schema/mvc
-			http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+			https://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
 		<mvc:annotation-driven/>
 
@@ -4007,7 +3988,7 @@ following example shows:
 ----
 
 In XML, you can check attributes and sub-elements of `<mvc:annotation-driven/>`. You can
-view the http://schema.spring.io/mvc/spring-mvc.xsd[Spring MVC XML schema] or use
+view the https://schema.spring.io/mvc/spring-mvc.xsd[Spring MVC XML schema] or use
 the code completion feature of your IDE to discover what attributes and
 sub-elements are available.
 
@@ -4049,9 +4030,9 @@ The following example shows how to achieve the same configuration in XML:
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="
 			http://www.springframework.org/schema/beans
-			http://www.springframework.org/schema/beans/spring-beans.xsd
+			https://www.springframework.org/schema/beans/spring-beans.xsd
 			http://www.springframework.org/schema/mvc
-			http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+			https://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
 		<mvc:annotation-driven conversion-service="conversionService"/>
 
@@ -4121,9 +4102,9 @@ The following example shows how to achieve the same configuration in XML:
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="
 			http://www.springframework.org/schema/beans
-			http://www.springframework.org/schema/beans/spring-beans.xsd
+			https://www.springframework.org/schema/beans/spring-beans.xsd
 			http://www.springframework.org/schema/mvc
-			http://www.springframework.org/schema/mvc/spring-mvc.xsd">
+			https://www.springframework.org/schema/mvc/spring-mvc.xsd">
 
 		<mvc:annotation-driven validator="globalValidator"/>
 
@@ -4290,8 +4271,8 @@ Which adds support for accessing parameter names (a feature added in Java 8).
 
 This builder customizes Jackson's default properties as follows:
 
-* http://fasterxml.github.io/jackson-databind/javadoc/2.6/com/fasterxml/jackson/databind/DeserializationFeature.html#FAIL_ON_UNKNOWN_PROPERTIES[`DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES`] is disabled.
-* http://fasterxml.github.io/jackson-databind/javadoc/2.6/com/fasterxml/jackson/databind/MapperFeature.html#DEFAULT_VIEW_INCLUSION[`MapperFeature.DEFAULT_VIEW_INCLUSION`] is disabled.
+* https://fasterxml.github.io/jackson-databind/javadoc/2.6/com/fasterxml/jackson/databind/DeserializationFeature.html#FAIL_ON_UNKNOWN_PROPERTIES[`DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES`] is disabled.
+* https://fasterxml.github.io/jackson-databind/javadoc/2.6/com/fasterxml/jackson/databind/MapperFeature.html#DEFAULT_VIEW_INCLUSION[`MapperFeature.DEFAULT_VIEW_INCLUSION`] is disabled.
 
 It also automatically registers the following well-known modules if they are detected on the classpath:
 
@@ -4301,8 +4282,8 @@ It also automatically registers the following well-known modules if they are det
 * https://github.com/FasterXML/jackson-datatype-jdk8[jackson-datatype-jdk8]: Support for other Java 8 types, such as `Optional`.
 
 NOTE: Enabling indentation with Jackson XML support requires
-http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.codehaus.woodstox%22%20AND%20a%3A%22woodstox-core-asl%22[`woodstox-core-asl`]
-dependency in addition to http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jackson-dataformat-xml%22[`jackson-dataformat-xml`] one.
+https://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.codehaus.woodstox%22%20AND%20a%3A%22woodstox-core-asl%22[`woodstox-core-asl`]
+dependency in addition to https://search.maven.org/#search%7Cga%7C1%7Ca%3A%22jackson-dataformat-xml%22[`jackson-dataformat-xml`] one.
 
 Other interesting Jackson modules are available:
 
@@ -4560,10 +4541,11 @@ Note that, when using both `EncodedResourceResolver` (for example, for serving g
 brotli-encoded resources) and `VersionedResourceResolver`, you must register them in this order.
 That ensures content-based versions are always computed reliably, based on the unencoded file.
 
-http://www.webjars.org/documentation[WebJars] is also supported through `WebJarsResourceResolver`
-and is automatically registered when `org.webjars:webjars-locator` is present on the
-classpath. The resolver can re-write URLs to include the version of the jar and can also
-match to incoming URLs without versions -- for example, `/jquery/jquery.min.js` to
+https://www.webjars.org/documentation[WebJars] are also supported through the
+`WebJarsResourceResolver` which is automatically registered when the
+`org.webjars:webjars-locator-core` library is present on the classpath. The resolver can
+re-write URLs to include the version of the jar and can also match against incoming URLs
+without versions -- for example, from `/jquery/jquery.min.js` to
 `/jquery/1.2.0/jquery.min.js`.
 
 

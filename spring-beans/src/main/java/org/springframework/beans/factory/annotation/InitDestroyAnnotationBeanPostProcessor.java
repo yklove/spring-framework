@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -79,6 +79,24 @@ import org.springframework.util.ReflectionUtils;
 @SuppressWarnings("serial")
 public class InitDestroyAnnotationBeanPostProcessor
 		implements DestructionAwareBeanPostProcessor, MergedBeanDefinitionPostProcessor, PriorityOrdered, Serializable {
+
+	private final transient LifecycleMetadata emptyLifecycleMetadata =
+			new LifecycleMetadata(Object.class, Collections.emptyList(), Collections.emptyList()) {
+				@Override
+				public void checkConfigMembers(RootBeanDefinition beanDefinition) {
+				}
+				@Override
+				public void invokeInitMethods(Object target, String beanName) {
+				}
+				@Override
+				public void invokeDestroyMethods(Object target, String beanName) {
+				}
+				@Override
+				public boolean hasDestroyMethods() {
+					return false;
+				}
+			};
+
 
 	protected transient Log logger = LogFactory.getLog(getClass());
 
@@ -200,7 +218,7 @@ public class InitDestroyAnnotationBeanPostProcessor
 
 	private LifecycleMetadata buildLifecycleMetadata(final Class<?> clazz) {
 		if (!AnnotationUtils.isCandidateClass(clazz, Arrays.asList(this.initAnnotationType, this.destroyAnnotationType))) {
-			return new LifecycleMetadata(clazz, Collections.emptyList(), Collections.emptyList());
+			return this.emptyLifecycleMetadata;
 		}
 
 		List<LifecycleElement> initMethods = new ArrayList<>();
@@ -233,7 +251,8 @@ public class InitDestroyAnnotationBeanPostProcessor
 		}
 		while (targetClass != null && targetClass != Object.class);
 
-		return new LifecycleMetadata(clazz, initMethods, destroyMethods);
+		return (initMethods.isEmpty() && destroyMethods.isEmpty() ? this.emptyLifecycleMetadata :
+				new LifecycleMetadata(clazz, initMethods, destroyMethods));
 	}
 
 

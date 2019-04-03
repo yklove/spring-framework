@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,9 +21,9 @@ import java.util.Collections;
 
 import io.netty.buffer.PooledByteBufAllocator;
 import io.rsocket.Closeable;
-import io.rsocket.Frame;
 import io.rsocket.RSocket;
 import io.rsocket.RSocketFactory;
+import io.rsocket.frame.decoder.PayloadDecoder;
 import io.rsocket.transport.netty.client.TcpClientTransport;
 import io.rsocket.transport.netty.server.TcpServerTransport;
 import io.rsocket.util.DefaultPayload;
@@ -64,7 +64,7 @@ public class RSocketServerToClientIntegrationTests {
 		context = new AnnotationConfigApplicationContext(RSocketConfig.class);
 
 		server = RSocketFactory.receive()
-				.frameDecoder(Frame::retain)  // as per https://github.com/rsocket/rsocket-java#zero-copy
+				.frameDecoder(PayloadDecoder.ZERO_COPY)
 				.acceptor(context.getBean("serverAcceptor", MessageHandlerAcceptor.class))
 				.transport(TcpServerTransport.create("localhost", 7000))
 				.start()
@@ -108,7 +108,7 @@ public class RSocketServerToClientIntegrationTests {
 			rsocket = RSocketFactory.connect()
 					.setupPayload(DefaultPayload.create("", destination))
 					.dataMimeType("text/plain")
-					.frameDecoder(Frame::retain)  // as per https://github.com/rsocket/rsocket-java#zero-copy
+					.frameDecoder(PayloadDecoder.ZERO_COPY)
 					.acceptor(context.getBean("clientAcceptor", MessageHandlerAcceptor.class))
 					.transport(TcpClientTransport.create("localhost", 7000))
 					.start()

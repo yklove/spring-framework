@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,6 +16,7 @@
 
 package org.springframework.web.reactive.function.server
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.reactor.mono
 import org.springframework.core.io.Resource
@@ -389,19 +390,22 @@ open class CoRouterFunctionDsl(private val init: (CoRouterFunctionDsl.() -> Unit
      */
     fun resources(lookupFunction: suspend (ServerRequest) -> Resource?) {
         builder.resources {
-            GlobalScope.mono {
+            GlobalScope.mono(Dispatchers.Unconfined) {
                 lookupFunction.invoke(it)
             }
         }
     }
 
+	/**
+	 * Return a composed routing function created from all the registered routes.
+	 */
     override fun invoke(): RouterFunction<ServerResponse> {
         init()
         return builder.build()
     }
 
     private fun asHandlerFunction(init: suspend (ServerRequest) -> ServerResponse) = HandlerFunction {
-        GlobalScope.mono {
+        GlobalScope.mono(Dispatchers.Unconfined) {
             init(it)
         }
     }
@@ -475,6 +479,9 @@ open class CoRouterFunctionDsl(private val init: (CoRouterFunctionDsl.() -> Unit
 
 }
 
+/**
+ * Equivalent to [RouterFunction.and].
+ */
 operator fun <T: ServerResponse> RouterFunction<T>.plus(other: RouterFunction<T>) =
         this.and(other)
 

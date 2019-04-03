@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.HttpStatus
@@ -66,6 +67,15 @@ class ClientResponseExtensionsTests {
 		every { response.bodyToMono<String>() } returns Mono.just("foo")
 		runBlocking {
 			assertEquals("foo", response.awaitBody<String>())
+		}
+	}
+
+	@Test
+	fun awaitBodyOrNull() {
+		val response = mockk<ClientResponse>()
+		every { response.bodyToMono<String>() } returns Mono.empty()
+		runBlocking {
+			assertNull(response.awaitBodyOrNull<String>())
 		}
 	}
 

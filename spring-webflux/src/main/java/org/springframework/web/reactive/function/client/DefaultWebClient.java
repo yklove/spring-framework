@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -316,8 +316,9 @@ class DefaultWebClient implements WebClient {
 			ClientRequest request = (this.inserter != null ?
 					initRequestBuilder().body(this.inserter).build() :
 					initRequestBuilder().build());
-			return Mono.defer(() -> exchangeFunction.exchange(request))
-					.switchIfEmpty(NO_HTTP_CLIENT_RESPONSE_ERROR);
+			return Mono.defer(() -> exchangeFunction.exchange(request)
+					.checkpoint("Request to " + this.httpMethod.name() + " " + this.uri + " [DefaultWebClient]")
+					.switchIfEmpty(NO_HTTP_CLIENT_RESPONSE_ERROR));
 		}
 
 		private ClientRequest.Builder initRequestBuilder() {
@@ -440,13 +441,13 @@ class DefaultWebClient implements WebClient {
 		@Override
 		public <T> Flux<T> bodyToFlux(Class<T> elementType) {
 			return this.responseMono.flatMapMany(response ->
-					handleBody(response, response.bodyToFlux(elementType), mono -> mono.flatMapMany(Flux::error)));
+					handleBody(response, response.bodyToFlux(elementType), mono -> mono.handle((t, sink) -> sink.error(t))));
 		}
 
 		@Override
 		public <T> Flux<T> bodyToFlux(ParameterizedTypeReference<T> elementType) {
-			return this.responseMono.flatMapMany(response -> handleBody(response,
-					response.bodyToFlux(elementType), mono -> mono.flatMapMany(Flux::error)));
+			return this.responseMono.flatMapMany(response ->
+					handleBody(response, response.bodyToFlux(elementType), mono -> mono.handle((t, sink) -> sink.error(t))));
 		}
 
 		private <T extends Publisher<?>> T handleBody(ClientResponse response,
@@ -459,7 +460,8 @@ class DefaultWebClient implements WebClient {
 						Mono<? extends Throwable> exMono = handler.apply(response, request);
 						exMono = exMono.flatMap(ex -> drainBody(response, ex));
 						exMono = exMono.onErrorResume(ex -> drainBody(response, ex));
-						return errorFunction.apply(exMono);
+						T result = errorFunction.apply(exMono);
+						return insertCheckpoint(result, response.statusCode(), request);
 					}
 				}
 				return bodyPublisher;
@@ -475,6 +477,22 @@ class DefaultWebClient implements WebClient {
 			// but ignore exception, in case the handler did consume.
 			return (Mono<T>) response.bodyToMono(Void.class)
 					.onErrorResume(ex2 -> Mono.empty()).thenReturn(ex);
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T extends Publisher<?>> T insertCheckpoint(T result, HttpStatus status, HttpRequest request) {
+			String httpMethod = request.getMethodValue();
+			URI uri = request.getURI();
+			String description = status + " from " + httpMethod + " " + uri + " [DefaultWebClient]";
+			if (result instanceof Mono) {
+				return (T) ((Mono<?>) result).checkpoint(description);
+			}
+			else if (result instanceof Flux) {
+				return (T) ((Flux<?>) result).checkpoint(description);
+			}
+			else {
+				return result;
+			}
 		}
 
 		private static Mono<WebClientResponseException> createResponseException(

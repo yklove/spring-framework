@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,16 +18,13 @@ package org.springframework.test.context.event;
 
 import org.springframework.core.Ordered;
 import org.springframework.test.context.TestContext;
+import org.springframework.test.context.TestExecutionListener;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 
 /**
  * {@link org.springframework.test.context.TestExecutionListener TestExecutionListener}
  * that publishes test lifecycle events to a Spring test
  * {@link org.springframework.context.ApplicationContext ApplicationContext}.
- *
- * <p>These events may be consumed for various reasons, such as resetting <em>mock</em>
- * beans or tracing test execution. Since these events may be consumed by regular
- * Spring beans, they can be shared among different test classes.
  *
  * <h3>Supported Events</h3>
  * <ul>
@@ -40,6 +37,31 @@ import org.springframework.test.context.support.AbstractTestExecutionListener;
  * <li>{@link AfterTestClassEvent}</li>
  * </ul>
  *
+ * <p>These events may be consumed for various reasons, such as resetting <em>mock</em>
+ * beans or tracing test execution. One advantage of consuming test events rather
+ * than implementing a custom {@link TestExecutionListener} is that test events
+ * may be consumed by any Spring bean registered in the test {@code ApplicationContext},
+ * and such beans may benefit directly from dependency injection and other features
+ * of the {@code ApplicationContext}. In contrast, a {@link TestExecutionListener}
+ * is not a bean in the {@code ApplicationContext}.
+ *
+ * <h3>Exception Handling</h3>
+ * <p>By default, if a test event listener throws an exception while consuming
+ * a test event, that exception will propagate to the underlying testing framework
+ * in use. For example, if the consumption of a {@code BeforeTestMethodEvent}
+ * results in an exception, the corresponding test method will fail as a result
+ * of the exception. In contrast, if an asynchronous test event listener throws
+ * an exception, the exception will not propagate to the underlying testing framework.
+ * For further details on asynchronous exception handling, consult the class-level
+ * Javadoc for {@link org.springframework.context.event.EventListener @EventListener}.
+ * 
+ * <h3>Asynchronous Listeners</h3>
+ * <p>If you want a particular test event listener to process events asynchronously,
+ * you can use Spring's {@link org.springframework.scheduling.annotation.Async @Async}
+ * support. For further details, consult the class-level Javadoc for
+ * {@link org.springframework.context.event.EventListener @EventListener}.
+ *
+ * <h3>Listener Registration</h3>
  * <p>Note that this {@code TestExecutionListener} is not registered by default,
  * but it may be registered for a given test class via
  * {@link org.springframework.test.context.TestExecutionListeners @TestExecutionListeners}

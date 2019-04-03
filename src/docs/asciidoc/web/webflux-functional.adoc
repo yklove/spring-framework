@@ -79,7 +79,7 @@ Most applications can run through the WebFlux Java configuration, see <<webflux-
 
 `ServerRequest` and `ServerResponse` are immutable interfaces that offer JDK 8-friendly
 access to the HTTP request and response.
-Both request and response provide http://www.reactive-streams.org[Reactive Streams] back pressure
+Both request and response provide https://www.reactive-streams.org[Reactive Streams] back pressure
 against the body streams.
 The request body is represented with a Reactor `Flux` or `Mono`.
 The response body is represented with any Reactive Streams `Publisher`, including `Flux` and `Mono`.
@@ -137,7 +137,7 @@ The following example shows how to access multiparts, one at a time, in streamin
 
 [source,java]
 ----
-Flux<Part> parts = request.body(BodyExtractos.toParts());
+Flux<Part> parts = request.body(BodyExtractors.toParts());
 ----
 
 
