@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2018 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.core.codec;
 import java.util.Collections;
 import java.util.function.Consumer;
 
+import org.junit.After;
 import org.junit.Test;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.BaseSubscriber;
@@ -37,8 +38,8 @@ import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.util.MimeType;
 import org.springframework.util.MimeTypeUtils;
 
-import static java.nio.charset.StandardCharsets.*;
-import static org.junit.Assert.*;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test cases for {@link ResourceRegionEncoder} class.
@@ -51,19 +52,24 @@ public class ResourceRegionEncoderTests  {
 	private LeakAwareDataBufferFactory bufferFactory = new LeakAwareDataBufferFactory();
 
 
+	@After
+	public void tearDown() throws Exception {
+		this.bufferFactory.checkForLeaks();
+	}
+
 	@Test
 	public void canEncode() {
 		ResolvableType resourceRegion = ResolvableType.forClass(ResourceRegion.class);
 		MimeType allMimeType = MimeType.valueOf("*/*");
 
-		assertFalse(this.encoder.canEncode(ResolvableType.forClass(Resource.class),
-				MimeTypeUtils.APPLICATION_OCTET_STREAM));
-		assertFalse(this.encoder.canEncode(ResolvableType.forClass(Resource.class), allMimeType));
-		assertTrue(this.encoder.canEncode(resourceRegion, MimeTypeUtils.APPLICATION_OCTET_STREAM));
-		assertTrue(this.encoder.canEncode(resourceRegion, allMimeType));
+		assertThat(this.encoder.canEncode(ResolvableType.forClass(Resource.class),
+				MimeTypeUtils.APPLICATION_OCTET_STREAM)).isFalse();
+		assertThat(this.encoder.canEncode(ResolvableType.forClass(Resource.class), allMimeType)).isFalse();
+		assertThat(this.encoder.canEncode(resourceRegion, MimeTypeUtils.APPLICATION_OCTET_STREAM)).isTrue();
+		assertThat(this.encoder.canEncode(resourceRegion, allMimeType)).isTrue();
 
 		// SPR-15464
-		assertFalse(this.encoder.canEncode(ResolvableType.NONE, null));
+		assertThat(this.encoder.canEncode(ResolvableType.NONE, null)).isFalse();
 	}
 
 	@Test
@@ -79,8 +85,6 @@ public class ResourceRegionEncoderTests  {
 				.consumeNextWith(stringConsumer("Spring"))
 				.expectComplete()
 				.verify();
-
-		 this.bufferFactory.checkForLeaks();
 	}
 
 	@Test
@@ -120,8 +124,6 @@ public class ResourceRegionEncoderTests  {
 				.consumeNextWith(stringConsumer("\r\n--" + boundary + "--"))
 				.expectComplete()
 				.verify();
-
-		 this.bufferFactory.checkForLeaks();
 	}
 
 	@Test // gh-22107
@@ -144,8 +146,23 @@ public class ResourceRegionEncoderTests  {
 		ZeroDemandSubscriber subscriber = new ZeroDemandSubscriber();
 		flux.subscribe(subscriber);
 		subscriber.cancel();
+	}
 
-		this.bufferFactory.checkForLeaks();
+	@Test // gh-22107
+	public void cancelWithoutDemandForSingleResourceRegion() {
+		Resource resource = new ClassPathResource("ResourceRegionEncoderTests.txt", getClass());
+		Mono<ResourceRegion> regions = Mono.just(new ResourceRegion(resource, 0, 6));
+		String boundary = MimeTypeUtils.generateMultipartBoundaryString();
+
+		Flux<DataBuffer> flux = this.encoder.encode(regions, this.bufferFactory,
+				ResolvableType.forClass(ResourceRegion.class),
+				MimeType.valueOf("text/plain"),
+				Collections.singletonMap(ResourceRegionEncoder.BOUNDARY_STRING_HINT, boundary)
+		);
+
+		ZeroDemandSubscriber subscriber = new ZeroDemandSubscriber();
+		flux.subscribe(subscriber);
+		subscriber.cancel();
 	}
 
 	@Test
@@ -170,16 +187,13 @@ public class ResourceRegionEncoderTests  {
 				.consumeNextWith(stringConsumer("Spring"))
 				.expectError(EncodingException.class)
 				.verify();
-
-		 this.bufferFactory.checkForLeaks();
 	}
 
 	protected Consumer<DataBuffer> stringConsumer(String expected) {
 		return dataBuffer -> {
-			String value =
-					DataBufferTestUtils.dumpString(dataBuffer, UTF_8);
+			String value = DataBufferTestUtils.dumpString(dataBuffer, UTF_8);
 			DataBufferUtils.release(dataBuffer);
-			assertEquals(expected, value);
+			assertThat(value).isEqualTo(expected);
 		};
 	}
 

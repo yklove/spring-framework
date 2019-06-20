@@ -40,6 +40,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import javax.inject.Provider;
 
@@ -360,6 +362,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T getBean(Class<T> requiredType, @Nullable Object... args) throws BeansException {
+		Assert.notNull(requiredType, "Required type must not be null");
 		Object resolved = resolveBean(ResolvableType.forRawClass(requiredType), args, false);
 		if (resolved == null) {
 			throw new NoSuchBeanDefinitionException(requiredType);
@@ -369,6 +372,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public <T> ObjectProvider<T> getBeanProvider(Class<T> requiredType) throws BeansException {
+		Assert.notNull(requiredType, "Required type must not be null");
 		return getBeanProvider(ResolvableType.forRawClass(requiredType));
 	}
 
@@ -980,13 +984,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 					updatedDefinitions.add(beanName);
 					// 替换掉旧的list
 					this.beanDefinitionNames = updatedDefinitions;
-					// 如果在manualSingletonNames存在当前的beanName,需要移除掉
-					if (this.manualSingletonNames.contains(beanName)) {
-						// 同样也是复制一份
-						Set<String> updatedSingletons = new LinkedHashSet<>(this.manualSingletonNames);
-						updatedSingletons.remove(beanName);
-						this.manualSingletonNames = updatedSingletons;
-					}
+					removeManualSingletonName(beanName);
 				}
 			}
 			else {
@@ -996,8 +994,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 				this.beanDefinitionMap.put(beanName, beanDefinition);
 				// 存放beanName
 				this.beanDefinitionNames.add(beanName);
-				// 从manualSingletonNames中移除已注册的beanName
-				this.manualSingletonNames.remove(beanName);
+				removeManualSingletonName(beanName);
 			}
 			this.frozenBeanDefinitionNames = null;
 		}
@@ -1094,40 +1091,51 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 	@Override
 	public void registerSingleton(String beanName, Object singletonObject) throws IllegalStateException {
 		super.registerSingleton(beanName, singletonObject);
-
-		if (hasBeanCreationStarted()) {
-			// Cannot modify startup-time collection elements anymore (for stable iteration)
-			synchronized (this.beanDefinitionMap) {
-				if (!this.beanDefinitionMap.containsKey(beanName)) {
-					Set<String> updatedSingletons = new LinkedHashSet<>(this.manualSingletonNames.size() + 1);
-					updatedSingletons.addAll(this.manualSingletonNames);
-					updatedSingletons.add(beanName);
-					this.manualSingletonNames = updatedSingletons;
-				}
-			}
-		}
-		else {
-			// Still in startup registration phase
-			if (!this.beanDefinitionMap.containsKey(beanName)) {
-				this.manualSingletonNames.add(beanName);
-			}
-		}
-
-		clearByTypeCache();
-	}
-
-	@Override
-	public void destroySingleton(String beanName) {
-		super.destroySingleton(beanName);
-		this.manualSingletonNames.remove(beanName);
+		updateManualSingletonNames(set -> set.add(beanName), set -> !this.beanDefinitionMap.containsKey(beanName));
 		clearByTypeCache();
 	}
 
 	@Override
 	public void destroySingletons() {
 		super.destroySingletons();
-		this.manualSingletonNames.clear();
+		updateManualSingletonNames(Set::clear, set -> !set.isEmpty());
 		clearByTypeCache();
+	}
+
+	@Override
+	public void destroySingleton(String beanName) {
+		super.destroySingleton(beanName);
+		removeManualSingletonName(beanName);
+		clearByTypeCache();
+	}
+
+	private void removeManualSingletonName(String beanName) {
+		updateManualSingletonNames(set -> set.remove(beanName), set -> set.contains(beanName));
+	}
+
+	/**
+	 * Update the factory's internal set of manual singleton names.
+	 * @param action the modification action
+	 * @param condition a precondition for the modification action
+	 * (if this condition does not apply, the action can be skipped)
+	 */
+	private void updateManualSingletonNames(Consumer<Set<String>> action, Predicate<Set<String>> condition) {
+		if (hasBeanCreationStarted()) {
+			// Cannot modify startup-time collection elements anymore (for stable iteration)
+			synchronized (this.beanDefinitionMap) {
+				if (condition.test(this.manualSingletonNames)) {
+					Set<String> updatedSingletons = new LinkedHashSet<>(this.manualSingletonNames);
+					action.accept(updatedSingletons);
+					this.manualSingletonNames = updatedSingletons;
+				}
+			}
+		}
+		else {
+			// Still in startup registration phase
+			if (condition.test(this.manualSingletonNames)) {
+				action.accept(this.manualSingletonNames);
+			}
+		}
 	}
 
 	/**
@@ -1145,6 +1153,7 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 	@Override
 	public <T> NamedBeanHolder<T> resolveNamedBean(Class<T> requiredType) throws BeansException {
+		Assert.notNull(requiredType, "Required type must not be null");
 		NamedBeanHolder<T> namedBean = resolveNamedBean(ResolvableType.forRawClass(requiredType), null, false);
 		if (namedBean != null) {
 			return namedBean;

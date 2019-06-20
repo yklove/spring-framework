@@ -61,6 +61,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.InjectionPoint;
 import org.springframework.beans.factory.UnsatisfiedDependencyException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.beans.factory.config.AutowiredPropertyMarker;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -1497,17 +1498,18 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		// 需要被注入的属性
 		PropertyValues pvs = (mbd.hasPropertyValues() ? mbd.getPropertyValues() : null);
 
-		if (mbd.getResolvedAutowireMode() == AUTOWIRE_BY_NAME || mbd.getResolvedAutowireMode() == AUTOWIRE_BY_TYPE) {
+		int resolvedAutowireMode = mbd.getResolvedAutowireMode();
+		if (resolvedAutowireMode == AUTOWIRE_BY_NAME || resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 			// 需要被注入的属性，临时变量
 			MutablePropertyValues newPvs = new MutablePropertyValues(pvs);
 			// Add property values based on autowire by name if applicable.
 			// 如果适用,根据名称添加基于autowire的属性值.
-			if (mbd.getResolvedAutowireMode() == AUTOWIRE_BY_NAME) {
+			if (resolvedAutowireMode == AUTOWIRE_BY_NAME) {
 				autowireByName(beanName, mbd, bw, newPvs);
 			}
 			// Add property values based on autowire by type if applicable.
 			// 如果适用，按类型添加基于autowire的属性值.
-			if (mbd.getResolvedAutowireMode() == AUTOWIRE_BY_TYPE) {
+			if (resolvedAutowireMode == AUTOWIRE_BY_TYPE) {
 				autowireByType(beanName, mbd, bw, newPvs);
 			}
 			// pvs保存了需要被注入的属性
@@ -1809,6 +1811,13 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 			else {
 				String propertyName = pv.getName();
 				Object originalValue = pv.getValue();
+				if (originalValue == AutowiredPropertyMarker.INSTANCE) {
+					Method writeMethod = bw.getPropertyDescriptor(propertyName).getWriteMethod();
+					if (writeMethod == null) {
+						throw new IllegalArgumentException("Autowire marker for property without write method: " + pv);
+					}
+					originalValue = new DependencyDescriptor(new MethodParameter(writeMethod, 0), true);
+				}
 				Object resolvedValue = valueResolver.resolveValueIfNecessary(pv, originalValue);
 				Object convertedValue = resolvedValue;
 				boolean convertible = bw.isWritableProperty(propertyName) &&
@@ -1991,7 +2000,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
 		String initMethodName = mbd.getInitMethodName();
 		Assert.state(initMethodName != null, "No init method set");
-		final Method initMethod = (mbd.isNonPublicAccessAllowed() ?
+		Method initMethod = (mbd.isNonPublicAccessAllowed() ?
 				BeanUtils.findMethod(bean.getClass(), initMethodName) :
 				ClassUtils.getMethodIfAvailable(bean.getClass(), initMethodName));
 
@@ -2013,15 +2022,16 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 		if (logger.isTraceEnabled()) {
 			logger.trace("Invoking init method  '" + initMethodName + "' on bean with name '" + beanName + "'");
 		}
+		Method methodToInvoke = ClassUtils.getInterfaceMethodIfPossible(initMethod);
 
 		if (System.getSecurityManager() != null) {
 			AccessController.doPrivileged((PrivilegedAction<Object>) () -> {
-				ReflectionUtils.makeAccessible(initMethod);
+				ReflectionUtils.makeAccessible(methodToInvoke);
 				return null;
 			});
 			try {
 				AccessController.doPrivileged((PrivilegedExceptionAction<Object>) () ->
-					initMethod.invoke(bean), getAccessControlContext());
+						methodToInvoke.invoke(bean), getAccessControlContext());
 			}
 			catch (PrivilegedActionException pae) {
 				InvocationTargetException ex = (InvocationTargetException) pae.getException();

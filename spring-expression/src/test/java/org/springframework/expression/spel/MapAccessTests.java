@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2016 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,7 @@ import org.springframework.tests.Assume;
 import org.springframework.tests.TestGroup;
 import org.springframework.util.StopWatch;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Testing variations on map access.
@@ -61,7 +60,7 @@ public class MapAccessTests extends AbstractExpressionTests {
 
 		Expression expr = parser.parseExpression("testMap.monday");
 		Object value = expr.getValue(ctx, String.class);
-		assertEquals("montag", value);
+		assertThat(value).isEqualTo("montag");
 	}
 
 	@Test
@@ -72,7 +71,7 @@ public class MapAccessTests extends AbstractExpressionTests {
 
 		Expression expr = parser.parseExpression("testMap[#day]");
 		Object value = expr.getValue(ctx, String.class);
-		assertEquals("samstag", value);
+		assertThat(value).isEqualTo("samstag");
 	}
 
 	@Test
@@ -86,7 +85,7 @@ public class MapAccessTests extends AbstractExpressionTests {
 
 		ExpressionParser parser = new SpelExpressionParser();
 		Expression expr = parser.parseExpression("testBean.properties['key2']");
-		assertEquals("value2", expr.getValue(bean));
+		assertThat(expr.getValue(bean)).isEqualTo("value2");
 	}
 
 	@Test
@@ -96,7 +95,7 @@ public class MapAccessTests extends AbstractExpressionTests {
 
 		ExpressionParser spelExpressionParser = new SpelExpressionParser();
 		Expression expr = spelExpressionParser.parseExpression("#root['key']");
-		assertEquals("value", expr.getValue(map));
+		assertThat(expr.getValue(map)).isEqualTo("value");
 	}
 
 	@Test
@@ -115,7 +114,7 @@ public class MapAccessTests extends AbstractExpressionTests {
 			expr.getValue(context);
 		}
 		s.stop();
-		assertThat(s.getTotalTimeMillis(), lessThan(200L));
+		assertThat(s.getTotalTimeMillis()).isLessThan(200L);
 	}
 
 

@@ -188,8 +188,11 @@ public final class ProducesRequestCondition extends AbstractRequestCondition<Pro
 	@Override
 	@Nullable
 	public ProducesRequestCondition getMatchingCondition(ServerWebExchange exchange) {
-		if (isEmpty() || CorsUtils.isPreFlightRequest(exchange.getRequest())) {
+		if (CorsUtils.isPreFlightRequest(exchange.getRequest())) {
 			return EMPTY_CONDITION;
+		}
+		if (isEmpty()) {
+			return this;
 		}
 		List<ProduceMediaTypeExpression> result = getMatchingExpressions(exchange);
 		if (!CollectionUtils.isEmpty(result)) {
@@ -314,6 +317,17 @@ public final class ProducesRequestCondition extends AbstractRequestCondition<Pro
 	 */
 	private List<ProduceMediaTypeExpression> getExpressionsToCompare() {
 		return (this.expressions.isEmpty() ? this.mediaTypeAllList  : this.expressions);
+	}
+
+
+	/**
+	 * Use this to clear {@link #MEDIA_TYPES_ATTRIBUTE} that contains the parsed,
+	 * requested media types.
+	 * @param exchange the current exchange
+	 * @since 5.2
+	 */
+	public static void clearMediaTypesAttribute(ServerWebExchange exchange) {
+		exchange.getAttributes().remove(MEDIA_TYPES_ATTRIBUTE);
 	}
 
 

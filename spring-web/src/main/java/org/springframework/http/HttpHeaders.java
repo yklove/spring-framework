@@ -71,6 +71,7 @@ import org.springframework.util.StringUtils;
  * @author Brian Clozel
  * @author Juergen Hoeller
  * @author Josh Long
+ * @author Sam Brannen
  * @since 3.0
  */
 public class HttpHeaders implements MultiValueMap<String, String>, Serializable {
@@ -438,6 +439,17 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 
 
 	/**
+	 * Get the list of header values for the given header name, if any.
+	 * @param headerName the header name
+	 * @return the list of header values, or an empty list
+	 * @since 5.2
+	 */
+	public List<String> getOrEmpty(Object headerName) {
+		List<String> values = get(headerName);
+		return (values != null ? values : Collections.emptyList());
+	}
+
+	/**
 	 * Set the list of acceptable {@linkplain MediaType media types},
 	 * as specified by the {@code Accept} header.
 	 */
@@ -704,7 +716,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	 */
 	public Set<HttpMethod> getAllow() {
 		String value = getFirst(ALLOW);
-		if (!StringUtils.isEmpty(value)) {
+		if (StringUtils.hasLength(value)) {
 			String[] tokens = StringUtils.tokenizeToStringArray(value, ",");
 			List<HttpMethod> result = new ArrayList<>(tokens.length);
 			for (String token : tokens) {
@@ -874,7 +886,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 	/**
 	 * Set the {@link Locale} of the content language,
 	 * as specified by the {@literal Content-Language} header.
-	 * <p>Use {@code set(CONTENT_LANGUAGE, ...)} if you need
+	 * <p>Use {@code put(CONTENT_LANGUAGE, list)} if you need
 	 * to set multiple content languages.</p>
 	 * @since 5.0
 	 */
@@ -1698,7 +1710,7 @@ public class HttpHeaders implements MultiValueMap<String, String>, Serializable 
 
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		if (this == other) {
 			return true;
 		}

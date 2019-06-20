@@ -65,7 +65,7 @@ public class RSocketServerToClientIntegrationTests {
 
 		server = RSocketFactory.receive()
 				.frameDecoder(PayloadDecoder.ZERO_COPY)
-				.acceptor(context.getBean("serverAcceptor", MessageHandlerAcceptor.class))
+				.acceptor(context.getBean("serverMessageHandler", RSocketMessageHandler.class).serverAcceptor())
 				.transport(TcpServerTransport.create("localhost", 7000))
 				.start()
 				.block();
@@ -106,10 +106,11 @@ public class RSocketServerToClientIntegrationTests {
 		RSocket rsocket = null;
 		try {
 			rsocket = RSocketFactory.connect()
-					.setupPayload(DefaultPayload.create("", destination))
+					.metadataMimeType("message/x.rsocket.routing.v0")
 					.dataMimeType("text/plain")
+					.setupPayload(DefaultPayload.create("", destination))
 					.frameDecoder(PayloadDecoder.ZERO_COPY)
-					.acceptor(context.getBean("clientAcceptor", MessageHandlerAcceptor.class))
+					.acceptor(context.getBean("clientMessageHandler", RSocketMessageHandler.class).clientAcceptor())
 					.transport(TcpClientTransport.create("localhost", 7000))
 					.start()
 					.block();
@@ -259,17 +260,16 @@ public class RSocketServerToClientIntegrationTests {
 		}
 
 		@Bean
-		public MessageHandlerAcceptor clientAcceptor() {
-			MessageHandlerAcceptor acceptor = new MessageHandlerAcceptor();
-			acceptor.setHandlers(Collections.singletonList(clientHandler()));
-			acceptor.setAutoDetectDisabled();
-			acceptor.setRSocketStrategies(rsocketStrategies());
-			return acceptor;
+		public RSocketMessageHandler clientMessageHandler() {
+			RSocketMessageHandler handler = new RSocketMessageHandler();
+			handler.setHandlers(Collections.singletonList(clientHandler()));
+			handler.setRSocketStrategies(rsocketStrategies());
+			return handler;
 		}
 
 		@Bean
-		public MessageHandlerAcceptor serverAcceptor() {
-			MessageHandlerAcceptor handler = new MessageHandlerAcceptor();
+		public RSocketMessageHandler serverMessageHandler() {
+			RSocketMessageHandler handler = new RSocketMessageHandler();
 			handler.setRSocketStrategies(rsocketStrategies());
 			return handler;
 		}

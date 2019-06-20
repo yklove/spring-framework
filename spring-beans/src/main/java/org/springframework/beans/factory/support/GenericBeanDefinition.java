@@ -83,18 +83,16 @@ public class GenericBeanDefinition extends AbstractBeanDefinition {
 	}
 
 	@Override
-	public boolean equals(Object other) {
+	public boolean equals(@Nullable Object other) {
 		return (this == other || (other instanceof GenericBeanDefinition && super.equals(other)));
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder("Generic bean");
 		if (this.parentName != null) {
-			sb.append(" with parent '").append(this.parentName).append("'");
+			return "Generic bean with parent '" + this.parentName + "': " + super.toString();
 		}
-		sb.append(": ").append(super.toString());
-		return sb.toString();
+		return "Generic bean: " + super.toString();
 	}
 
 }
