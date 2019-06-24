@@ -39,6 +39,7 @@ import org.springframework.core.codec.StringDecoder;
 import org.springframework.core.io.buffer.NettyDataBufferFactory;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.rsocket.annotation.support.RSocketMessageHandler;
 import org.springframework.stereotype.Controller;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,7 +66,7 @@ public class RSocketClientToServerIntegrationTests {
 		context = new AnnotationConfigApplicationContext(ServerConfig.class);
 
 		server = RSocketFactory.receive()
-				.addServerPlugin(interceptor)
+				.addResponderPlugin(interceptor)
 				.frameDecoder(PayloadDecoder.ZERO_COPY)
 				.acceptor(context.getBean(RSocketMessageHandler.class).serverAcceptor())
 				.transport(TcpServerTransport.create("localhost", 7000))

@@ -18,18 +18,110 @@ package org.springframework.web.method;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import javax.annotation.Priority;
 
 import org.junit.Test;
 
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
+ * Unit tests for {@link ControllerAdviceBean}.
+ *
  * @author Brian Clozel
+ * @author Sam Brannen
  */
 public class ControllerAdviceBeanTests {
+
+	@Test
+	public void constructorPreconditions() {
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> new ControllerAdviceBean(null))
+			.withMessage("Bean must not be null");
+
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> new ControllerAdviceBean((String) null, null))
+			.withMessage("Bean name must contain text");
+
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> new ControllerAdviceBean("", null))
+			.withMessage("Bean name must contain text");
+
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> new ControllerAdviceBean("\t", null))
+			.withMessage("Bean name must contain text");
+
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> new ControllerAdviceBean("myBean", null))
+			.withMessage("BeanFactory must not be null");
+	}
+
+	@Test
+	public void equalsHashCodeAndToStringForBeanName() {
+		String beanName = "myBean";
+		BeanFactory beanFactory = mock(BeanFactory.class);
+		given(beanFactory.containsBean(beanName)).willReturn(true);
+
+		ControllerAdviceBean bean1 = new ControllerAdviceBean(beanName, beanFactory);
+		ControllerAdviceBean bean2 = new ControllerAdviceBean(beanName, beanFactory);
+		assertEqualsHashCodeAndToString(bean1, bean2, beanName);
+	}
+
+	@Test
+	public void equalsHashCodeAndToStringForBeanInstance() {
+		String toString = "beanInstance";
+		Object beanInstance = new Object() {
+			@Override
+			public String toString() {
+				return toString;
+			}
+		};
+		ControllerAdviceBean bean1 = new ControllerAdviceBean(beanInstance);
+		ControllerAdviceBean bean2 = new ControllerAdviceBean(beanInstance);
+		assertEqualsHashCodeAndToString(bean1, bean2, toString);
+	}
+
+	@Test
+	public void orderedWithLowestPrecedenceByDefaultForBeanName() {
+		assertOrder(SimpleControllerAdvice.class, Ordered.LOWEST_PRECEDENCE);
+	}
+
+	@Test
+	public void orderedWithLowestPrecedenceByDefaultForBeanInstance() {
+		assertOrder(new SimpleControllerAdvice(), Ordered.LOWEST_PRECEDENCE);
+	}
+
+	@Test
+	public void orderedViaOrderedInterfaceForBeanName() {
+		assertOrder(OrderedControllerAdvice.class, 42);
+	}
+
+	@Test
+	public void orderedViaOrderedInterfaceForBeanInstance() {
+		assertOrder(new OrderedControllerAdvice(), 42);
+	}
+
+	@Test
+	public void orderedViaAnnotationForBeanName() {
+		assertOrder(OrderAnnotationControllerAdvice.class, 42);
+		assertOrder(PriorityAnnotationControllerAdvice.class, 42);
+	}
+
+	@Test
+	public void orderedViaAnnotationForBeanInstance() {
+		assertOrder(new OrderAnnotationControllerAdvice(), 42);
+		assertOrder(new PriorityAnnotationControllerAdvice(), 42);
+	}
 
 	@Test
 	public void shouldMatchAll() {
@@ -100,6 +192,34 @@ public class ControllerAdviceBeanTests {
 		assertNotApplicable("should not match", bean, InheritanceController.class);
 	}
 
+	private void assertEqualsHashCodeAndToString(ControllerAdviceBean bean1, ControllerAdviceBean bean2, String toString) {
+		assertThat(bean1).isEqualTo(bean2);
+		assertThat(bean2).isEqualTo(bean1);
+		assertThat(bean1.hashCode()).isEqualTo(bean2.hashCode());
+		assertThat(bean1.toString()).isEqualTo(toString);
+		assertThat(bean2.toString()).isEqualTo(toString);
+	}
+
+	private void assertOrder(Object bean, int expectedOrder) {
+		assertThat(new ControllerAdviceBean(bean).getOrder()).isEqualTo(expectedOrder);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void assertOrder(Class beanType, int expectedOrder) {
+		String beanName = "myBean";
+		BeanFactory beanFactory = mock(BeanFactory.class);
+		given(beanFactory.containsBean(beanName)).willReturn(true);
+		given(beanFactory.getType(beanName)).willReturn(beanType);
+		given(beanFactory.getBean(beanName)).willReturn(BeanUtils.instantiateClass(beanType));
+
+		ControllerAdviceBean controllerAdviceBean = new ControllerAdviceBean(beanName, beanFactory);
+
+		assertThat(controllerAdviceBean.getOrder()).isEqualTo(expectedOrder);
+		verify(beanFactory).containsBean(beanName);
+		verify(beanFactory).getType(beanName);
+		verify(beanFactory).getBean(beanName);
+	}
+
 	private void assertApplicable(String message, ControllerAdviceBean controllerAdvice, Class<?> controllerBeanType) {
 		assertThat(controllerAdvice).isNotNull();
 		assertThat(controllerAdvice.isApplicableToBeanType(controllerBeanType)).as(message).isTrue();
@@ -115,6 +235,23 @@ public class ControllerAdviceBeanTests {
 
 	@ControllerAdvice
 	static class SimpleControllerAdvice {}
+
+	@ControllerAdvice
+	@Order(42)
+	static class OrderAnnotationControllerAdvice {}
+
+	@ControllerAdvice
+	@Priority(42)
+	static class PriorityAnnotationControllerAdvice {}
+
+	@ControllerAdvice
+	static class OrderedControllerAdvice implements Ordered {
+
+		@Override
+		public int getOrder() {
+			return 42;
+		}
+	}
 
 	@ControllerAdvice(annotations = ControllerAnnotation.class)
 	static class AnnotationSupport {}
