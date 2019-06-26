@@ -20,8 +20,8 @@ public class XmlBeanFactoryTest {
 //		Person person2 = (Person) beanFactory.getBean("personClient2");
 //		System.out.println(person);
 
-		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
-		ctx.getBean("personClient");
+//		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("beans.xml");
+//		ctx.getBean("personClient");
 
 //		A a = (A) beanFactory.getBean("a");
 //		System.out.println(a);

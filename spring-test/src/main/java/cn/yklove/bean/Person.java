@@ -12,6 +12,8 @@ public class Person extends PersonSuper{
 
 	private String test;
 
+	private Person user;
+
 	public String getName() {
 		return name;
 	}
@@ -47,6 +49,14 @@ public class Person extends PersonSuper{
 
 	public Person(String name) {
 		this.name = name;
+	}
+
+	public Person getUser() {
+		return user;
+	}
+
+	public void setUser(Person user) {
+		this.user = user;
 	}
 
 	@Override
