@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2018 the original author or authors.
+ * Copyright 2002-2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -699,8 +699,8 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 				bean.destroy();
 			}
 			catch (Throwable ex) {
-				if (logger.isInfoEnabled()) {
-					logger.info("Destroy method on bean with name '" + beanName + "' threw an exception", ex);
+				if (logger.isWarnEnabled()) {
+					logger.warn("Destruction of bean with name '" + beanName + "' threw an exception", ex);
 				}
 			}
 		}
@@ -740,6 +740,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * should <i>not</i> have their own mutexes involved in singleton creation,
 	 * to avoid the potential for deadlocks in lazy-init situations.
 	 */
+	@Override
 	public final Object getSingletonMutex() {
 		return this.singletonObjects;
 	}

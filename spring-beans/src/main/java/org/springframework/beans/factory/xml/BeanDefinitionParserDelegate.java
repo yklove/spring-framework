@@ -509,7 +509,7 @@ public class BeanDefinitionParserDelegate {
 		if (StringUtils.hasText(beanName) && this.usedNames.contains(beanName)) {
 			foundName = beanName;
 		}
-		if (foundName == null) {  
+		if (foundName == null) {
 			//寻找别名集合中在usedNames集合中第一个相同的对象
 			foundName = CollectionUtils.findFirstMatch(this.usedNames, aliases);
 		}
@@ -694,9 +694,7 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * 解析元数据
-	 * @param ele
-	 * @param attributeAccessor
+	 * Parse the meta elements underneath the given element, if any.
 	 */
 	public void parseMetaElements(Element ele, BeanMetadataAttributeAccessor attributeAccessor) {
 		NodeList nl = ele.getChildNodes();
@@ -717,23 +715,27 @@ public class BeanDefinitionParserDelegate {
 		}
 	}
 
+	/**
+	 * Parse the given autowire attribute value into
+	 * {@link AbstractBeanDefinition} autowire constants.
+	 */
 	@SuppressWarnings("deprecation")
-	public int getAutowireMode(String attValue) {
-		String att = attValue;
-		if (isDefaultValue(att)) {
-			att = this.defaults.getAutowire();
+	public int getAutowireMode(String attrValue) {
+		String attr = attrValue;
+		if (isDefaultValue(attr)) {
+			attr = this.defaults.getAutowire();
 		}
 		int autowire = AbstractBeanDefinition.AUTOWIRE_NO;
-		if (AUTOWIRE_BY_NAME_VALUE.equals(att)) {
+		if (AUTOWIRE_BY_NAME_VALUE.equals(attr)) {
 			autowire = AbstractBeanDefinition.AUTOWIRE_BY_NAME;
 		}
-		else if (AUTOWIRE_BY_TYPE_VALUE.equals(att)) {
+		else if (AUTOWIRE_BY_TYPE_VALUE.equals(attr)) {
 			autowire = AbstractBeanDefinition.AUTOWIRE_BY_TYPE;
 		}
-		else if (AUTOWIRE_CONSTRUCTOR_VALUE.equals(att)) {
+		else if (AUTOWIRE_CONSTRUCTOR_VALUE.equals(attr)) {
 			autowire = AbstractBeanDefinition.AUTOWIRE_CONSTRUCTOR;
 		}
-		else if (AUTOWIRE_AUTODETECT_VALUE.equals(att)) {
+		else if (AUTOWIRE_AUTODETECT_VALUE.equals(attr)) {
 			autowire = AbstractBeanDefinition.AUTOWIRE_AUTODETECT;
 		}
 		// Else leave default value.
@@ -1043,6 +1045,12 @@ public class BeanDefinitionParserDelegate {
 		}
 	}
 
+	/**
+	 * Parse a value, ref or collection sub-element of a property or
+	 * constructor-arg element.
+	 * @param ele subelement of property element; we don't know which yet
+	 * @param bd the current bean definition (if any)
+	 */
 	@Nullable
 	public Object parsePropertySubElement(Element ele, @Nullable BeanDefinition bd) {
 		return parsePropertySubElement(ele, bd, null);
@@ -1052,6 +1060,7 @@ public class BeanDefinitionParserDelegate {
 	 * Parse a value, ref or collection sub-element of a property or
 	 * constructor-arg element.
 	 * @param ele subelement of property element; we don't know which yet
+	 * @param bd the current bean definition (if any)
 	 * @param defaultValueType the default type (class name) for any
 	 * {@code <value>} tag that might be created
 	 */
@@ -1439,11 +1448,22 @@ public class BeanDefinitionParserDelegate {
 		return TRUE_VALUE.equals(value);
 	}
 
+	/**
+	 * Parse a custom element (outside of the default namespace).
+	 * @param ele the element to parse
+	 * @return the resulting bean definition
+	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele) {
 		return parseCustomElement(ele, null);
 	}
 
+	/**
+	 * Parse a custom element (outside of the default namespace).
+	 * @param ele the element to parse
+	 * @param containingBd the containing bean definition (if any)
+	 * @return the resulting bean definition
+	 */
 	@Nullable
 	public BeanDefinition parseCustomElement(Element ele, @Nullable BeanDefinition containingBd) {
 		// 获取对应的命名空间
@@ -1462,26 +1482,26 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * 解析自定义的属性
-	 * @param ele
-	 * @param definitionHolder
-	 * @return
+	 * Decorate the given bean definition through a namespace handler, if applicable.
+	 * @param ele the current element
+	 * @param originalDef the current bean definition
+	 * @return the decorated bean definition
 	 */
-	public BeanDefinitionHolder decorateBeanDefinitionIfRequired(Element ele, BeanDefinitionHolder definitionHolder) {
-		return decorateBeanDefinitionIfRequired(ele, definitionHolder, null);
+	public BeanDefinitionHolder decorateBeanDefinitionIfRequired(Element ele, BeanDefinitionHolder originalDef) {
+		return decorateBeanDefinitionIfRequired(ele, originalDef, null);
 	}
 
 	/**
-	 * 解析自定义的属性
-	 * @param ele
-	 * @param definitionHolder
-	 * @param containingBd
-	 * @return
+	 * Decorate the given bean definition through a namespace handler, if applicable.
+	 * @param ele the current element
+	 * @param originalDef the current bean definition
+	 * @param containingBd the containing bean definition (if any)
+	 * @return the decorated bean definition
 	 */
 	public BeanDefinitionHolder decorateBeanDefinitionIfRequired(
-			Element ele, BeanDefinitionHolder definitionHolder, @Nullable BeanDefinition containingBd) {
+			Element ele, BeanDefinitionHolder originalDef, @Nullable BeanDefinition containingBd) {
 
-		BeanDefinitionHolder finalDefinition = definitionHolder;
+		BeanDefinitionHolder finalDefinition = originalDef;
 
 		// Decorate based on custom attributes first.
 		// 遍历所有属性,首先根据自定义属性进行装饰bean.
@@ -1504,11 +1524,12 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * 根据自定义属性或结点装饰bean
-	 * @param node
-	 * @param originalDef
-	 * @param containingBd
-	 * @return
+	 * Decorate the given bean definition through a namespace handler,
+	 * if applicable.
+	 * @param node the current child node
+	 * @param originalDef the current bean definition
+	 * @param containingBd the containing bean definition (if any)
+	 * @return the decorated bean definition
 	 */
 	public BeanDefinitionHolder decorateIfRequired(
 			Node node, BeanDefinitionHolder originalDef, @Nullable BeanDefinition containingBd) {
@@ -1526,7 +1547,7 @@ public class BeanDefinitionParserDelegate {
 					return decorated;
 				}
 			}
-			else if (namespaceUri.startsWith("http://www.springframework.org/")) {
+			else if (namespaceUri.startsWith("http://www.springframework.org/schema/")) {
 				error("Unable to locate Spring NamespaceHandler for XML schema namespace [" + namespaceUri + "]", node);
 			}
 			else {
@@ -1609,18 +1630,14 @@ public class BeanDefinitionParserDelegate {
 	}
 
 	/**
-	 * 检查传入的node是否是默认的命名空间(http://www.springframework.org/schema/beans)
-	 * @param namespaceUri namespaceUri可以为空
-	 * @return 是否是默认的命名空间
+	 * Determine whether the given URI indicates the default namespace.
 	 */
 	public boolean isDefaultNamespace(@Nullable String namespaceUri) {
 		return (!StringUtils.hasLength(namespaceUri) || BEANS_NAMESPACE_URI.equals(namespaceUri));
 	}
 
 	/**
-	 * 检查传入的node是否是默认的命名空间
-	 * @param node
-	 * @return 是否是默认的命名空间
+	 * Determine whether the given node indicates the default namespace.
 	 */
 	public boolean isDefaultNamespace(Node node) {
 		return isDefaultNamespace(getNamespaceURI(node));
